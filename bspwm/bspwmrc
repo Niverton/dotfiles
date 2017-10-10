@@ -1,0 +1,61 @@
+#! /bin/sh
+
+sxhkd &
+redshift &
+$HOME/.config/polybar/launch.sh & #Bar
+#$HOME/.fehbg &
+#feh --bg-fill ~/.config/bspwm/wallpaper.png &
+xsetroot -solid '#121212' & # Background
+urxvtd & #Terminal emulator deamon
+xss-lock ~/.config/sxhkd/lock.sh & # Lock on suspend
+
+firefox &
+steam &
+discord &
+
+black='#121212'
+dark_gray='#1D1F21'
+almost_white='#D8D8D8'
+red='#AB4642'
+green='#A1B56C'
+yellow='#F7CA88'
+blue='#7CAFC2'
+pink='#BA8BAF'
+cyan='#86C1B9'
+gray='#585858'
+
+bspc config normal_border_color $dark_gray
+bspc config focused_border_color $gray
+#echo $yellow
+
+
+bspc monitor -d 1 2 3 4 5
+
+bspc config border_width            2
+bspc config window_gap              0
+
+bspc config split_ratio             0.52
+bspc config borderless_monocle      true
+bspc config gapless_monocle         true
+
+# Pointer actions
+bspc config pointer_modifier mod4
+bspc config pointer_action1 move
+bspc config pointer_action2 resize_corner
+bspc config pointer_action3 none
+bspc config focus_follows_pointer true
+#bspc config pointer_follows_focus true
+
+#bspc rule -a Gimp desktop='^8' state=floating follow=on
+bspc rule -a Firefox desktop='^1'
+bspc rule -a discord desktop='^4'
+bspc rule -a Steam desktop='^5' state=floating
+bspc rule -a *:Steam desktop='^5' state=floating
+bspc rule -a Screenkey manage=off
+bspc rule -a Pcmanfm state=floating
+#Dunst notification deamon
+bspc rule -a Dunst manage=off
+#Quake terminal test
+bspc rule -a URxvt:quake state=floating
+#Launcher test
+#bspc rule -a "*:launcher" manage=off
