@@ -97,6 +97,7 @@ set smartcase
 " ----------------------------- FUZZY FILE SEARCH -----------------------------
   set path+=**
   set wildmenu
+  set wildignorecase
 
 " -------------------------------- NETRW CONFIG -------------------------------
   let g:netrw_banner=0        " disable banner
@@ -116,7 +117,7 @@ nnoremap <leader>! :<Up><Home>!<CR>
         " Write buffer to tee standard input, dump the output and save it to
         " file.
 cmap w!! w !sudo tee % > /dev/null %
-    " Nohl 
+    " Nohl
 nnoremap <leader><leader> :nohl<CR>
     " Normal mode from terminal mode
 tnoremap <Esc> <C-\><C-n>
