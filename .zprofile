@@ -1,6 +1,7 @@
 if [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ]; then
   exec startx
 elif [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 2 ]; then
+  xrdb -merge .Xresources &
   xss-lock .config/sway/lock.sh &
   dunst &
 
