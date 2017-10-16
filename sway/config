@@ -1,8 +1,8 @@
-# Default config for sway
-#
-# Copy this to ~/.config/sway/config and edit it to your liking.
-#
-# Read `man 5 sway` for a complete reference.
+### Startup
+exec --no-startup-id urxvtd
+exec --no-startup-id dunst
+exec --no-startup-id firefox
+exec --no-startup-id discord
 
 ### Variables
 #
@@ -14,7 +14,7 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term urxvt
+set $term urxvtc
 # Your preferred application launcher
 #set $menu rofi -show run -color-window "#1d1f21, #585858, #585858" -color-normal "#1d1f21, #d8d8d8, #585858, #d8d8d8, #1d1f21" -color-active "#1d1f21, #f7ca88, #585858, #f7ca88, #1d1f21" -color-urgent "#1d1f21, #ab4642, #585858, #ab4642, #d8d8d8"
 set $menu dmenu_run -fn monospace:11
