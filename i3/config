@@ -3,8 +3,9 @@
 ### Startup
 exec --no-startup-id urxvtd
 exec --no-startup-id dunst
-exec --no-startup-id firefox
-exec --no-startup-id discord
+#exec --no-startup-id firefox
+#exec --no-startup-id discord
+exec --no-startup-id redshift
 
 
 set $wallpaper /usr/share/backgrounds/Arch.png
@@ -43,7 +44,9 @@ font pango:monospace 10
 
 # Basics:
 #
-    
+    # Jump to urgent window
+    bindsym $mod+c [urgent=latest] focus
+
     # Lock screen
     bindsym $mod+x exec $lock
 
@@ -182,7 +185,40 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
-#
+mode "screen" {
+    #Toggle outputs
+      bindsym f exec --no-startup-id xrandr --output HDMI-2 --auto --right-of eDP-1
+      bindsym Shift+f exec --no-startup-id xrandr --output HDMI-2 --auto --off
+
+      bindsym d exec --no-startup-id xrandr --output DP-1 --auto --right-of eDP-1
+      bindsym Shift+d exec --no-startup-id xrandr --output DP-1 --auto --off
+
+    #Move containers
+      bindsym $left  move container to output left
+      bindsym $down  move container to output down
+      bindsym $up    move container to output up
+      bindsym $right move container to output right
+    #
+      bindsym Left  move container to output left
+      bindsym Down  move container to output down
+      bindsym Up    move container to output up
+      bindsym Right move container to output right
+    #Move workspaces
+      bindsym Shift+$left  move workspace to output left
+      bindsym Shift+$down  move workspace to output down
+      bindsym Shift+$up    move workspace to output up
+      bindsym Shift+$right move workspace to output right
+    #
+      bindsym Shift+Left  move workspace to output left
+      bindsym Shift+Down  move workspace to output down
+      bindsym Shift+Up    move workspace to output up
+      bindsym Shift+Right move workspace to output right
+
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+}
+bindsym $mod+o mode "screen"
+
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
