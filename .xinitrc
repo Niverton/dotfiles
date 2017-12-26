@@ -32,13 +32,13 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
  unset f
 fi
 
-xinput set-prop MOSART\ Semi.\ 2.4G\ Wireless\ Mouse Coordinate\ Transformation\ Matrix 0.3 0 0 0 0.3 0 0 0 1
+#xinput set-prop MOSART\ Semi.\ 2.4G\ Wireless\ Mouse Coordinate\ Transformation\ Matrix 0.3 0 0 0 0.3 0 0 0 1
 setxkbmap fr
 xinput set-prop SynPS/2\ Synaptics\ TouchPad libinput\ Tapping\ Enabled 1
 numlockx on
-xsetroot -cursor_name left_ptr #Cursor on root is left arrow
+#xsetroot -cursor_name left_ptr #Cursor on root is left arrow
 
 #exec startlxde
 #exec awesome
-exec bspwm
-#exec i3
+#exec bspwm
+exec i3
