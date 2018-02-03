@@ -1,204 +1,236 @@
 " ------------------------------- PLUGIN SECTION ------------------------------
-call plug#begin('~/.local/share/nvim/plugged')
 
-" Oceanic-next Theme
-" Plug 'mhartington/oceanic-next'
+  call plug#begin('~/.local/share/nvim/plugged')
 
-" Session manager
-Plug 'tpope/vim-obsession'
+  " Oceanic-next Theme
+  " Plug 'mhartington/oceanic-next'
 
-" Multiple Cursors
-" Le raccourci c'est Ctrl-N
-Plug 'terryma/vim-multiple-cursors'
+  " Session manager
+  Plug 'tpope/vim-obsession'
 
-"
-Plug 'drzel/vim-in-proportion'
+  "Auto close tags
+  Plug 'tpope/vim-endwise'
+  Plug 'tpope/vim-ragtag'
 
-" Python modules manager
-Plug 'roxma/python-support.nvim'
-let g:python_support_python2_require = 0
+  "Auto close pairs
+  Plug 'jiangmiao/auto-pairs'
 
-" for python completions
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
-" language specific completions on markdown file
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
+  " Python modules manager
+  Plug 'roxma/python-support.nvim'
+  let g:python_support_python2_require = 0
 
-" utils, optional
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
-let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
+  " for python completions
+  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
+  " language specific completions on markdown file
+  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
 
-" Vim Airline
-Plug 'vim-airline/vim-airline'
+  " utils, optional
+  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
+  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
-let g:airline_theme='minimalist'
-let g:airline#extensions#tabline#enabled=1
+  " Vim Airline
+  "Plug 'vim-airline/vim-airline'
 
-" Minimalist
-Plug 'dikiaap/minimalist'
+  "let g:airline_theme='minimalist'
+  "let g:airline#extensions#tabline#enabled=1
 
-Plug 'plasticboy/vim-markdown'
+  " Minimalist
+  Plug 'dikiaap/minimalist'
 
-" Asynchronous Lint Engine
-Plug 'w0rp/ale'
-"Config
-"let g:ale_linters = {
-"      \   'cpp': ['clang'],
-"\}
-let g:ale_cpp_clang_config='-std=c++17 -Wall -I. -I../include -I./include'
-let g:ale_cpp_clangcheck_options='-std=c++17'
-let g:ale_cpp_clangtidy_options='-- -std=c++17'
+  Plug 'plasticboy/vim-markdown'
 
-" let g:ale_cpp_gcc_config='-std=c++1z -Wall -I. -I../include -I./include'
-let g:airline#extensions#ale#enabled = 1
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_insert_leave = 1
-    "Remaps
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
+  " Asynchronous Lint Engine
+  Plug 'w0rp/ale'
+  "Config
+  let g:ale_linters = {
+        \   'cpp': ['clang'],
+  \}
+  let g:ale_cpp_clang_config='-std=c++17 -Wall -I. -I../include -I./include'
+  let g:ale_cpp_clangcheck_options='-std=c++17'
+  let g:ale_cpp_clangtidy_options='-- -std=c++17'
 
-"Deoplete
-"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"Plug 'zchee/deoplete-clang'
-"let g:deoplete#enable_at_startup = 1
-"let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
-"let g:deoplete#sources#clang#clang_header = '/usr/include/clang'
-"    "Complete from included files
-"Plug 'Shougo/neoinclude.vim'
-    "Use echo bar for documentation
-"Plug 'Shougo/echodoc.vim'
+  " let g:ale_cpp_gcc_config='-std=c++1z -Wall -I. -I../include -I./include'
+  "let g:airline#extensions#ale#enabled = 1
+  let g:ale_lint_on_text_changed = 'never'
+  let g:ale_lint_on_insert_leave = 1
+      "Remaps
+  nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+  nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
-"Plug 'roxma/nvim-completion-manager'
-"Plug 'roxma/ncm-clang'
+  "Deoplete
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+  Plug 'zchee/deoplete-clang'
+  let g:deoplete#enable_at_startup = 1
+  let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
+  let g:deoplete#sources#clang#clang_header = '/usr/include/clang'
+      "Complete from included files
+  Plug 'Shougo/neoinclude.vim'
+     "Use echo bar for documentation
+  Plug 'Shougo/echodoc.vim'
 
-" LSP
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-let g:LanguageClient_autoStart = 1
-let g:LanguageClient_serverCommands = {
-    \ 'cpp': ['clangd',],
-    \ }
+  "Plug 'roxma/nvim-completion-manager'
+  "Plug 'roxma/ncm-clang'
 
-" Autoclose parenthesis etc.
-Plug 'Raimondi/delimitMate'
+  " LSP
+  "Plug 'autozimu/LanguageClient-neovim', {
+  "    \ 'branch': 'next',
+  "    \ 'do': 'bash install.sh',
+  "    \ }
+  "let g:LanguageClient_autoStart = 1
+  "let g:LanguageClient_serverCommands = {
+  "    \ 'cpp': ['clangd',],
+  "    \ }
 
-" GDScript syntax
-Plug 'a-watson/vim-gdscript'
+  " GDScript syntax
+  Plug 'a-watson/vim-gdscript'
 
-Plug 'kovetskiy/sxhkd-vim'
+  " Git
+  Plug 'tpope/vim-fugitive'
 
-" Git
-"Plug 'tpope/vim-fugitive'
+  " Beautify separators
+  Plug 'guywald1/vim-prismo'
+  let g:prismo_dash='—'
 
-" Beautify separators
-Plug 'guywald1/vim-prismo'
-let g:prismo_dash='—'
-nnoremap <leader>p :Prismo<CR>
+  Plug 'vim-airline/vim-airline'
+  let g:airline_powerline_fonts = 1
+  let g:airline_extensions = ['whitespace']         "Extensions whitelist
+  let g:airline_highlighting_cache = 1  "Enable cache
 
-call plug#end()
+  call plug#end()
 
 " -------------------------------- COLORSCHEME --------------------------------
 
-colorscheme minimalist
+  colorscheme minimalist
+  let g:airline_theme='minimalist'
+  let g:airline_powerline_fonts = 1
+  "let g:airline#extensions#tabline#enabled = 1
 
 " ---------------------------------- SETTINGS ---------------------------------
 
-let mapleader=','
-set nofoldenable        " Disable folding
-set tabstop=2           " Tab size
-set shiftwidth=2        " Indent size
-set softtabstop=-1      " see help
-set expandtab           " Use spaces instead of tabs
-"set number              " Display line numbers
-set cursorline          " highlight cursor line
-set mouse=a
-set ignorecase
-set smartcase
+  let mapleader=','
+  set tabstop=8           " Tab size
+  set shiftwidth=2        " Indent size
+  set softtabstop=8       " see help
+  set expandtab           " Use spaces instead of tabs
+  "set number             " Display line numbers
+  set tw=72               " Line wrap at 72 chars
+  set cursorline          " highlight cursor line
+  set mouse=a
+  filetype indent on
+  set lazyredraw            "Redraw screen only when needed
+  set showmatch
+
+" ----------------------------------- SEARCH ----------------------------------
+
+  set ignorecase
+  set smartcase
+  set incsearch           "Search when typing
+  set hlsearch
+
+" ---------------------------------- FOLDING ----------------------------------
+
+  set foldenable
+  set foldlevelstart=10
+  set foldnestmax=10
+  set foldmethod=indent
+  "Toggle fold
+  nnoremap <space> za
+
 
 " -------------------------------- SPELL CHECK --------------------------------
+
   highlight clear SpellBad
   highlight SpellBad cterm=underline
   command! SpellCheckEng :setlocal spell spelllang=en
   command! SpellCheckFra :setlocal spell spelllang=fr
 
 " ----------------------------- FUZZY FILE SEARCH -----------------------------
+
   set path+=**
   set wildmenu
   set wildignorecase
 
 " -------------------------------- NETRW CONFIG -------------------------------
+
   let g:netrw_banner=0        " disable banner
   let g:netrw_browse_split=0  " open in current window
   let g:netrw_altv=1          " open splits to the right
   let g:netrw_liststyle=3     " tree view
 
 " ----------------------------------- REMAPS ----------------------------------
+
     " Remove trailing whitespaces
     " (http://vim.wikia.com/wiki/Remove_unwanted_spaces)
-nnoremap <leader>t :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
-    "Insert new line
-nmap OO O<Esc>j
-nmap oo o<Esc>k
+  nnoremap <leader>t :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
+      "Insert new line
+  nmap OO O<Esc>j
+  nmap oo o<Esc>k
 
-    " ctags -R .
-"nnoremap <leader>m !ctags -R .<CR>
-command! Ctags :silent !ctags -R .
-command! Cpptags :silent !ctags -R . --c++-kinds=+p --fields=+iaS --extra=+q
-    " Re-execute previous command prepending bang (!)
-nnoremap <leader>! :<Up><Home>!<CR>
-    " Save file as root
-        " Write buffer to tee standard input, dump the output and save it to
-        " file.
-cnoremap w!! w !sudo tee % > /dev/null %
-    " Nohl
-nnoremap <leader><leader> :nohl<CR>
-    " Nonumber
-let numberstatus=0
-nnoremap <silent> <leader>n :if (numberstatus%2 == 0) \| set number \| else \| set nonumber \| endif \| let numberstatus=numberstatus+1<cr>
-    " Normal mode from terminal mode
-tnoremap <Esc> <C-\><C-n>
-tnoremap <A-h> <C-\><C-N><C-w>h
-tnoremap <A-j> <C-\><C-N><C-w>j
-tnoremap <A-k> <C-\><C-N><C-w>k
-tnoremap <A-l> <C-\><C-N><C-w>l
-inoremap <A-h> <C-\><C-N><C-w>h
-inoremap <A-j> <C-\><C-N><C-w>j
-inoremap <A-k> <C-\><C-N><C-w>k
-inoremap <A-l> <C-\><C-N><C-w>l
-nnoremap <A-h> <C-w>h
-nnoremap <A-j> <C-w>j
-nnoremap <A-k> <C-w>k
-nnoremap <A-l> <C-w>l
-    " Replace all occurences of word under cursor
-nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
-    " Navigate buffers quickly
-nnoremap <C-q> :bnext<CR>
-nnoremap <C-s> :bprevious<CR>
+  nnoremap j gj
+  nnoremap k gk
 
-    " Move line
-nnoremap <A-Up> "mddk"mP
-nnoremap <A-Down> "mdd"mp
+      " ctags -R .
+  "nnoremap <leader>m !ctags -R .<CR>
+  command! Ctags :silent !ctags -R .
+  command! Cpptags :silent !ctags -R . --c++-kinds=+p --fields=+iaS --extras=+q
+      " Re-execute previous command prepending bang (!)
+  nnoremap <leader>! :<Up><Home>!<CR>
+      " Save file as root
+          " Write buffer to tee standard input, dump the output and save it to
+          " file.
+  cnoremap w!! w !sudo tee % > /dev/null %
+      " Nohl
+  nnoremap <leader><leader> :nohl<CR>
+      " Nonumber
+  let numberstatus=0
+  nnoremap <silent> <leader>n :if (numberstatus%2 == 0) \| set number \| else \| set nonumber \| endif \| let numberstatus=numberstatus+1<cr>
+      " Normal mode from terminal mode
+  tnoremap <Esc> <C-\><C-n>
+  tnoremap <A-h> <C-\><C-N><C-w>h
+  tnoremap <A-j> <C-\><C-N><C-w>j
+  tnoremap <A-k> <C-\><C-N><C-w>k
+  tnoremap <A-l> <C-\><C-N><C-w>l
+  inoremap <A-h> <C-\><C-N><C-w>h
+  inoremap <A-j> <C-\><C-N><C-w>j
+  inoremap <A-k> <C-\><C-N><C-w>k
+  inoremap <A-l> <C-\><C-N><C-w>l
+  nnoremap <A-h> <C-w>h
+  nnoremap <A-j> <C-w>j
+  nnoremap <A-k> <C-w>k
+  nnoremap <A-l> <C-w>l
+      " Replace all occurences of word under cursor
+  nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+      " Navigate buffers quickly
+  nnoremap <C-q> :bnext<CR>
+  nnoremap <C-s> :bprevious<CR>
+
+      " Move line
+  nnoremap <A-Up> "mddk"mP
+  nnoremap <A-Down> "mdd"mp
 
 " ------------------------------ CUSTOM FUNCTIONS -----------------------------
-nnoremap <leader>o :call SwitchHeaderToSource()<CR>
-function! SwitchHeaderToSource()
-    if expand('%:e') == 'h' || expand('%:e') == 'hpp'
-        if filereadable(expand('%:r').'.cpp')
-            execute ':edit '.expand('%:r').'.cpp'
-        elseif filereadable(expand('%:r').'.cc')
-            execute ':edit '.expand('%:r').'.cc'
-        elseif filereadable(expand('%:r').'.c')
-            execute ':edit '.expand('%:r').'.c'
-        else
-            echo "Source file doesn't exist"
-        endif
-    elseif expand('%:e') == 'c' || expand('%:e') == 'cpp' || expand('%:e') == 'cc'
-        if filereadable(expand('%:r').'.hpp')
-            execute ':edit '.expand('%:r').'.hpp'
-        elseif filereadable(expand('%:r').'.h')
-            execute ':edit '.expand('%:r').'.h'
-        else
-            echo "Source file doesn't exist"
-        endif
+
+  nnoremap <leader>o :call SwitchHeaderToSource()<CR>
+  function! SwitchHeaderToSource()
+      if expand('%:e') == 'h' || expand('%:e') == 'hpp'
+          if filereadable(expand('%:r').'.cpp')
+              execute ':edit '.expand('%:r').'.cpp'
+          elseif filereadable(expand('%:r').'.cc')
+              execute ':edit '.expand('%:r').'.cc'
+          elseif filereadable(expand('%:r').'.c')
+              execute ':edit '.expand('%:r').'.c'
+          else
+              echo "Source file doesn't exist"
+          endif
+      elseif expand('%:e') == 'c' || expand('%:e') == 'cpp' || expand('%:e') == 'cc'
+          if filereadable(expand('%:r').'.hpp')
+              execute ':edit '.expand('%:r').'.hpp'
+          elseif filereadable(expand('%:r').'.h')
+              execute ':edit '.expand('%:r').'.h'
+          else
+              echo "Source file doesn't exist"
+          endif
 
 
-    endif
-endfunction
+      endif
+  endfunction
