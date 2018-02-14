@@ -3,7 +3,17 @@
   call plug#begin('~/.local/share/nvim/plugged')
 
   " Oceanic-next Theme
-  " Plug 'mhartington/oceanic-next'
+  "Plug 'mhartington/oceanic-next'
+
+  " Minimalist
+  "Plug 'dikiaap/minimalist'
+  
+  " Gruvbox
+  Plug 'morhetz/gruvbox'
+    let g:gruvbox_contrast_dark='hard'
+    let g:gruvbox_contrast_light='medium'
+    let g:gruvbox_inverse='1'
+    let g:gruvbox_italic='1'
 
   " Session manager
   Plug 'tpope/vim-obsession'
@@ -28,15 +38,7 @@
   let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
   let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
-  " Vim Airline
-  "Plug 'vim-airline/vim-airline'
-
-  "let g:airline_theme='minimalist'
-  "let g:airline#extensions#tabline#enabled=1
-
-  " Minimalist
-  Plug 'dikiaap/minimalist'
-
+  "
   Plug 'plasticboy/vim-markdown'
 
   " Asynchronous Lint Engine
@@ -96,12 +98,35 @@
   let g:airline_extensions = ['whitespace']         "Extensions whitelist
   let g:airline_highlighting_cache = 1  "Enable cache
 
+  " Clang Format
+  Plug 'rhysd/vim-clang-format'
+  " Look for style file
+  let g:clang_format#detect_style_file = 1
+  " Default style
+  let g:clang_format#code_style = 'llvm'
+  let g:clang_format#style_options = {
+      \ "AlwaysBreakTemplateDeclarations" : "true",
+      \ "Standard" : "C++11",
+      \}
+  " Auto enable
+  "autocmd FileType c,cpp,objc ClangFormatAutoEnable
+  " Leader + f
+  autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
+  autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
   call plug#end()
+
+  "GLSL
+  Plug 'tikhomirov/vim-glsl'
 
 " -------------------------------- COLORSCHEME --------------------------------
 
-  colorscheme minimalist
-  let g:airline_theme='minimalist'
+  " Enable true color support
+  set termguicolors
+  let s:cs='gruvbox'
+  set background=dark
+  " Set colorscheme from var
+  execute 'colorscheme ' . s:cs
+  let g:airline_theme=s:cs
   let g:airline_powerline_fonts = 1
   "let g:airline#extensions#tabline#enabled = 1
 
@@ -132,7 +157,7 @@
   set foldenable
   set foldlevelstart=10
   set foldnestmax=10
-  set foldmethod=indent
+  set foldmethod=syntax
   "Toggle fold
   nnoremap <space> za
 
@@ -179,8 +204,8 @@
           " Write buffer to tee standard input, dump the output and save it to
           " file.
   cnoremap w!! w !sudo tee % > /dev/null %
-      " Nohl
-  nnoremap <leader><leader> :nohl<CR>
+      " Nohl && close preview window
+  nnoremap <leader><leader> :nohl<CR>:pc<CR>
       " Nonumber
   let numberstatus=0
   nnoremap <silent> <leader>n :if (numberstatus%2 == 0) \| set number \| else \| set nonumber \| endif \| let numberstatus=numberstatus+1<cr>
