@@ -88,6 +88,8 @@
 
   " Git
   Plug 'tpope/vim-fugitive'
+    "Browse GitHub repos
+    Plug 'tpope/vim-rhubarb'
 
   " Beautify separators
   Plug 'guywald1/vim-prismo'
