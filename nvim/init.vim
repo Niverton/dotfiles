@@ -1,3 +1,4 @@
+scriptencoding=utf-8
 " ------------------------------- PLUGIN SECTION ------------------------------
 
   call plug#begin('~/.local/share/nvim/plugged')
@@ -7,7 +8,7 @@
 
   " Minimalist
   "Plug 'dikiaap/minimalist'
-  
+
   " Gruvbox
   Plug 'morhetz/gruvbox'
     let g:gruvbox_contrast_dark='hard'
@@ -45,16 +46,26 @@
   Plug 'w0rp/ale'
   "Config
   let g:ale_linters = {
-        \   'cpp': ['clang'],
+  \     'cpp':  ['clang',
+  \             'clangtidy',
+  \             'clang-format'],
+  \     'c':    ['clang',
+  \             'clangtidy',
+  \             'clang-format'],
+  \}
+  let g:ale_fixers = {
+  \     'cpp':  ['clangtidy',
+  \             'clang-format'],
+  \     'c':    ['clangtidy',
+  \             'clang-format'],
   \}
   let g:ale_cpp_clang_config='-std=c++17 -Wall -I. -I../include -I./include'
   let g:ale_cpp_clangcheck_options='-std=c++17'
   let g:ale_cpp_clangtidy_options='-- -std=c++17'
 
   " let g:ale_cpp_gcc_config='-std=c++1z -Wall -I. -I../include -I./include'
-  "let g:airline#extensions#ale#enabled = 1
   let g:ale_lint_on_text_changed = 'never'
-  let g:ale_lint_on_insert_leave = 1
+  let g:ale_lint_on_insert_leave = 0
       "Remaps
   nmap <silent> <C-k> <Plug>(ale_previous_wrap)
   nmap <silent> <C-j> <Plug>(ale_next_wrap)
@@ -88,8 +99,6 @@
 
   " Git
   Plug 'tpope/vim-fugitive'
-    "Browse GitHub repos
-    Plug 'tpope/vim-rhubarb'
 
   " Beautify separators
   Plug 'guywald1/vim-prismo'
@@ -97,8 +106,9 @@
 
   Plug 'vim-airline/vim-airline'
   let g:airline_powerline_fonts = 1
-  let g:airline_extensions = ['whitespace']         "Extensions whitelist
-  let g:airline_highlighting_cache = 1  "Enable cache
+  "let g:airline_extensions = ['whitespace']             "Extensions whitelist
+  let g:airline_highlighting_cache = 1                  "Enable cache
+  let g:airline#extensions#ale#enabled = 1              " ALE
 
   " Clang Format
   Plug 'rhysd/vim-clang-format'
@@ -107,8 +117,8 @@
   " Default style
   let g:clang_format#code_style = 'llvm'
   let g:clang_format#style_options = {
-      \ "AlwaysBreakTemplateDeclarations" : "true",
-      \ "Standard" : "C++11",
+      \ 'AlwaysBreakTemplateDeclarations' : 'true',
+      \ 'Standard' : 'C++11',
       \}
   " Auto enable
   "autocmd FileType c,cpp,objc ClangFormatAutoEnable
@@ -134,18 +144,19 @@
 
 " ---------------------------------- SETTINGS ---------------------------------
 
-  let mapleader=','
+  let g:mapleader=','
   set tabstop=8           " Tab size
   set shiftwidth=2        " Indent size
   set softtabstop=8       " see help
   set expandtab           " Use spaces instead of tabs
   "set number             " Display line numbers
-  set tw=72               " Line wrap at 72 chars
+  set textwidth=72               " Line wrap at 72 chars
   set cursorline          " highlight cursor line
   set mouse=a
   filetype indent on
   set lazyredraw            "Redraw screen only when needed
   set showmatch
+  set autoread
 
 " ----------------------------------- SEARCH ----------------------------------
 
@@ -176,6 +187,10 @@
   set path+=**
   set wildmenu
   set wildignorecase
+  " ignore these files when completing names and in Ex
+  set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam
+  " set of file name suffixes that will be given a lower priority when it comes to matching wildcards
+  set suffixes+=.old
 
 " -------------------------------- NETRW CONFIG -------------------------------
 
@@ -209,7 +224,7 @@
       " Nohl && close preview window
   nnoremap <leader><leader> :nohl<CR>:pc<CR>
       " Nonumber
-  let numberstatus=0
+  let g:numberstatus=0
   nnoremap <silent> <leader>n :if (numberstatus%2 == 0) \| set number \| else \| set nonumber \| endif \| let numberstatus=numberstatus+1<cr>
       " Normal mode from terminal mode
   tnoremap <Esc> <C-\><C-n>
