@@ -23,6 +23,9 @@ scriptencoding=utf-8
   Plug 'tpope/vim-endwise'
   Plug 'tpope/vim-ragtag'
 
+  "Comment
+  Plug 'tpope/vim-commentary'
+
   "Auto close pairs
   Plug 'jiangmiao/auto-pairs'
 
@@ -59,11 +62,8 @@ scriptencoding=utf-8
   \     'c':    ['clangtidy',
   \             'clang-format'],
   \}
-  let g:ale_cpp_clang_config='-std=c++17 -Wall -I. -I../include -I./include'
-  let g:ale_cpp_clangcheck_options='-std=c++17'
-  let g:ale_cpp_clangtidy_options='-- -std=c++17'
+  let g:ale_c_build_dir_names = ['build', 'bin', 'debug', 'release']
 
-  " let g:ale_cpp_gcc_config='-std=c++1z -Wall -I. -I../include -I./include'
   let g:ale_lint_on_text_changed = 'never'
   let g:ale_lint_on_insert_leave = 0
       "Remaps
@@ -108,7 +108,9 @@ scriptencoding=utf-8
   let g:airline_powerline_fonts = 1
   "let g:airline_extensions = ['whitespace']             "Extensions whitelist
   let g:airline_highlighting_cache = 1                  "Enable cache
-  let g:airline#extensions#ale#enabled = 1              " ALE
+  let g:airline#extensions#ale#enabled = 1              "ALE
+
+  let g:ale_echo_msg_format = '%severity% [%linter%]% code%: %s'
 
   " Clang Format
   Plug 'rhysd/vim-clang-format'
@@ -125,10 +127,11 @@ scriptencoding=utf-8
   " Leader + f
   autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
   autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
-  call plug#end()
 
   "GLSL
   Plug 'tikhomirov/vim-glsl'
+
+  call plug#end()
 
 " -------------------------------- COLORSCHEME --------------------------------
 
@@ -150,11 +153,11 @@ scriptencoding=utf-8
   set softtabstop=8       " see help
   set expandtab           " Use spaces instead of tabs
   "set number             " Display line numbers
-  set textwidth=72               " Line wrap at 72 chars
+  set textwidth=72        " Line wrap at 72 chars
   set cursorline          " highlight cursor line
   set mouse=a
   filetype indent on
-  set lazyredraw            "Redraw screen only when needed
+  set lazyredraw          "Redraw screen only when needed
   set showmatch
   set autoread
 
@@ -170,7 +173,7 @@ scriptencoding=utf-8
   set foldenable
   set foldlevelstart=10
   set foldnestmax=10
-  set foldmethod=syntax
+  set foldmethod=indent
   "Toggle fold
   nnoremap <space> za
 
@@ -189,7 +192,8 @@ scriptencoding=utf-8
   set wildignorecase
   " ignore these files when completing names and in Ex
   set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam
-  " set of file name suffixes that will be given a lower priority when it comes to matching wildcards
+  " set of file name suffixes that will be given a lower priority when
+  " it comes to matching wildcards
   set suffixes+=.old
 
 " -------------------------------- NETRW CONFIG -------------------------------
