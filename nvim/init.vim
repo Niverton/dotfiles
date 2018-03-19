@@ -218,7 +218,7 @@ endif
 
     " Remove trailing whitespaces
     " (http://vim.wikia.com/wiki/Remove_unwanted_spaces)
-  nnoremap <leader>t :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
+  command! Trim :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
       "Insert new line
   nmap OO O<Esc>j
   nmap oo o<Esc>k
