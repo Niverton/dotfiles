@@ -167,7 +167,8 @@ endif
   set cursorline          " highlight cursor line
   set mouse=a
   filetype indent on
-  set lazyredraw          "Redraw screen only when needed
+  set lazyredraw          " Redraw screen only when needed
+  set noshowmode
   set showmatch
   set autoread
 
