@@ -226,18 +226,27 @@ endif
   nnoremap j gj
   nnoremap k gk
 
+    "List buffers and prompt
+  nnoremap <leader>b :ls<CR>:buffer
+    "List tabs and switch
+  nnoremap <leader>v :tabs<CR>:tabnext
+
       " ctags -R .
   "nnoremap <leader>m !ctags -R .<CR>
   command! Ctags :silent !ctags -R .
   command! Cpptags :silent !ctags -R . --c++-kinds=+p --fields=+iaS --extras=+q
+
       " Re-execute previous command prepending bang (!)
   nnoremap <leader>! :<Up><Home>!<CR>
+
       " Save file as root
           " Write buffer to tee standard input, dump the output and save it to
           " file.
   cnoremap w!! w !sudo tee % > /dev/null %
+
       " Nohl && close preview window
   nnoremap <leader><leader> :nohl<CR>:pc<CR>
+
       " Nonumber
   let g:numberstatus=0
   nnoremap <silent> <leader>n :if (numberstatus%2 == 0) \| set number \| else \| set nonumber \| endif \| let numberstatus=numberstatus+1<cr>
