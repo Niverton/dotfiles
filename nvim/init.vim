@@ -149,7 +149,7 @@ endif
 
 " ---------------------------------- SETTINGS ---------------------------------
 
-  let g:mapleader=','
+  let g:mapleader="\<Space>"
   set tabstop=8           " Tab size
   set shiftwidth=2        " Indent size
   set softtabstop=8       " see help
@@ -177,7 +177,7 @@ endif
   set foldnestmax=10
   set foldmethod=indent
   "Toggle fold
-  nnoremap <space> za
+  "nnoremap <space> za
 
 
 " -------------------------------- SPELL CHECK --------------------------------
