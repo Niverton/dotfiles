@@ -137,10 +137,18 @@ endif
 
 " -------------------------------- COLORSCHEME --------------------------------
 
+  "Set the background according to time of day
+  let time = str2nr(system("date +%-H"))
+  if time >= 18 || time < 8 
+    set background=dark
+  else
+    set background=light
+  endif
+  unlet time
+
   " Enable true color support
   set termguicolors
   let s:cs='gruvbox'
-  set background=dark
   " Set colorscheme from var
   execute 'colorscheme ' . s:cs
   let g:airline_theme=s:cs
