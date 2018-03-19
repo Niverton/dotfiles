@@ -105,10 +105,6 @@ endif
   " Git
   Plug 'tpope/vim-fugitive'
 
-  " Beautify separators
-  Plug 'guywald1/vim-prismo'
-  let g:prismo_dash='—'
-
   Plug 'vim-airline/vim-airline'
   let g:airline_powerline_fonts = 1
   "let g:airline_extensions = ['whitespace']             "Extensions whitelist
