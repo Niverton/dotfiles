@@ -69,8 +69,8 @@ endif
   \}
   let g:ale_c_build_dir_names = ['build', 'bin', 'debug', 'release']
 
-  let g:ale_lint_on_text_changed = 'never'
-  let g:ale_lint_on_insert_leave = 0
+  "let g:ale_lint_on_text_changed = 'never'
+  let g:ale_lint_on_insert_leave = 1
       "Remaps
   nmap <silent> <C-k> <Plug>(ale_previous_wrap)
   nmap <silent> <C-j> <Plug>(ale_next_wrap)
