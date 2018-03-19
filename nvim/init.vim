@@ -104,6 +104,7 @@ endif
 
   " Git
   Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-rhubarb'
 
   Plug 'vim-airline/vim-airline'
   let g:airline_powerline_fonts = 1
