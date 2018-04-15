@@ -1,5 +1,5 @@
 scriptencoding=utf-8
-" ------------------------------- PLUGIN SECTION ------------------------------ 
+" ------------------------------- PLUGIN SECTION ------------------------------
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -7,12 +7,6 @@ if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
 endif
 
   call plug#begin('~/.local/share/nvim/plugged')
-
-  " Oceanic-next Theme
-  "Plug 'mhartington/oceanic-next'
-
-  " Minimalist
-  "Plug 'dikiaap/minimalist'
 
   " Gruvbox
   Plug 'morhetz/gruvbox'
@@ -27,12 +21,10 @@ endif
   "Auto close tags
   Plug 'tpope/vim-endwise'
   Plug 'tpope/vim-ragtag'
+  Plug 'tpope/vim-surround'
 
   "Comment
   Plug 'tpope/vim-commentary'
-
-  "Auto close pairs
-  Plug 'jiangmiao/auto-pairs'
 
   " Python modules manager
   Plug 'roxma/python-support.nvim'
@@ -53,9 +45,11 @@ endif
   " Asynchronous Lint Engine
   Plug 'w0rp/ale'
   "Config
+  let g:ale_echo_msg_format = '%severity% [%linter%]% code%: %s'
   let g:ale_linters = {
   \     'cpp':  ['clang',
   \             'clangtidy',
+  \             'cppcheck',
   \             'clang-format'],
   \     'c':    ['clang',
   \             'clangtidy',
@@ -68,12 +62,23 @@ endif
   \             'clang-format'],
   \}
   let g:ale_c_build_dir_names = ['build', 'bin', 'debug', 'release']
+  let g:ale_cpp_clangtidy_checks = [
+  \     '*',
+  \     '-android*',
+  \     '-google*',
+  \     '-fuchsia*',
+  \     '-llvm-header-guard',
+  \     '-cppcoreguidelines-pro-type-union-access',
+  \     '-cppcoreguidelines-pro-bounds-array-to-pointer-decay',
+  \     '-hicpp-no-array-decay'
+  \]
+  let g:ale_cpp_cppcheck_options = '--enable=warning,performance,information,style'
 
   "let g:ale_lint_on_text_changed = 'never'
   let g:ale_lint_on_insert_leave = 1
       "Remaps
-  nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-  nmap <silent> <C-j> <Plug>(ale_next_wrap)
+  nmap <silent> <leader>j <Plug>(ale_previous_wrap)
+  nmap <silent> <leader>k <Plug>(ale_next_wrap)
 
   "Deoplete
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -81,38 +86,31 @@ endif
   let g:deoplete#enable_at_startup = 1
   let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
   let g:deoplete#sources#clang#clang_header = '/usr/include/clang'
-      "Complete from included files
+    "Complete from included files
   Plug 'Shougo/neoinclude.vim'
-     "Use echo bar for documentation
+    "Use echo bar for documentation
   Plug 'Shougo/echodoc.vim'
-
-  "Plug 'roxma/nvim-completion-manager'
-  "Plug 'roxma/ncm-clang'
-
-  " LSP
-  "Plug 'autozimu/LanguageClient-neovim', {
-  "    \ 'branch': 'next',
-  "    \ 'do': 'bash install.sh',
-  "    \ }
-  "let g:LanguageClient_autoStart = 1
-  "let g:LanguageClient_serverCommands = {
-  "    \ 'cpp': ['clangd',],
-  "    \ }
-
-  " GDScript syntax
-  Plug 'a-watson/vim-gdscript'
 
   " Git
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-rhubarb'
 
-  Plug 'vim-airline/vim-airline'
-  let g:airline_powerline_fonts = 1
-  "let g:airline_extensions = ['whitespace']             "Extensions whitelist
-  let g:airline_highlighting_cache = 1                  "Enable cache
-  let g:airline#extensions#ale#enabled = 1              "ALE
+  " LightLine
+  Plug 'itchyny/lightline.vim'
+  Plug 'hanschen/lightline-gruvbox.vim'
+  let g:lightline = {
+        \ 'colorscheme': 'gruvbox',
+        \ 'active': {
+        \   'left': [ [ 'mode', 'paste' ],
+        \             [ 'gitbranch', 'readonly', 'filename' ] ]
+        \ },
+        \ 'component_function': {
+        \   'gitbranch': 'fugitive#head',
+        \   'filename' : 'LightlineFilename',
+        \   'mode'     : 'LightlineMode',
+        \ },
+        \ }
 
-  let g:ale_echo_msg_format = '%severity% [%linter%]% code%: %s'
 
   " Clang Format
   Plug 'rhysd/vim-clang-format'
@@ -130,37 +128,44 @@ endif
   autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
   autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
 
-  "GLSL
+  " GLSL
   Plug 'tikhomirov/vim-glsl'
+
+  " Latex
+  "Plug 'vim-latex/vim-latex'
+  
+
+  " Snippets
+  Plug 'SirVer/ultisnips'
+  let g:UltiSnipsEditSplit="context"
+  "Plug 'honza/vim-snippets'
+  Plug 'niverton/niv-snippets'
 
   call plug#end()
 
 " -------------------------------- COLORSCHEME --------------------------------
 
   "Set the background according to time of day
-  let time = str2nr(system("date +%-H"))
-  if time >= 18 || time < 8 
-    set background=dark
-  else
-    set background=light
-  endif
-  unlet time
+  "let time = str2nr(system("date +%-H"))
+  "if time >= 18 || time < 8
+  "  set background=dark
+  "else
+  "  set background=light
+  "endif
+  "unlet time
+  "
+  set background=dark
 
   " Enable true color support
   set termguicolors
-  let s:cs='gruvbox'
-  " Set colorscheme from var
-  execute 'colorscheme ' . s:cs
-  let g:airline_theme=s:cs
-  let g:airline_powerline_fonts = 1
-  "let g:airline#extensions#tabline#enabled = 1
+  colorscheme gruvbox
 
 " ---------------------------------- SETTINGS ---------------------------------
 
   let g:mapleader="\<Space>"
-  set tabstop=8           " Tab size
+  "set tabstop=8           " Tab size
   set shiftwidth=2        " Indent size
-  set softtabstop=8       " see help
+  "set softtabstop=8       " see help
   set expandtab           " Use spaces instead of tabs
   "set number             " Display line numbers
   set textwidth=72        " Line wrap at 72 chars
@@ -209,7 +214,7 @@ endif
 
 " -------------------------------- NETRW CONFIG -------------------------------
 
-  let g:netrw_banner=0        " disable banner
+  "let g:netrw_banner=0        " disable banner
   let g:netrw_browse_split=0  " open in current window
   let g:netrw_altv=1          " open splits to the right
   let g:netrw_liststyle=3     " tree view
@@ -220,16 +225,21 @@ endif
     " (http://vim.wikia.com/wiki/Remove_unwanted_spaces)
   command! Trim :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
       "Insert new line
-  nmap OO O<Esc>j
-  nmap oo o<Esc>k
+  "nmap OO O<Esc>j
+  "nmap oo o<Esc>k
+  
+  " Unmap space for use as leader
+  nnoremap <Space> <nop>
 
   nnoremap j gj
   nnoremap k gk
+    " Make
+  nnoremap <leader>m :make<CR>
 
     "List buffers and prompt
-  nnoremap <leader>b :ls<CR>:buffer
+  nnoremap <leader>b :ls<CR>:buffer 
     "List tabs and switch
-  nnoremap <leader>v :tabs<CR>:tabnext
+  nnoremap <leader>v :tabs<CR>:tabnext 
 
       " ctags -R .
   "nnoremap <leader>m !ctags -R .<CR>
@@ -264,6 +274,16 @@ endif
   nnoremap <A-j> <C-w>j
   nnoremap <A-k> <C-w>k
   nnoremap <A-l> <C-w>l
+      " Stop using arrow keys
+  nnoremap <Left>  <C-w>h
+  nnoremap <Down>  <C-w>j
+  nnoremap <Up>    <C-w>k
+  nnoremap <Right> <C-w>l
+  "inoremap <Left>  <nop>
+  "inoremap <Down>  <nop>
+  "inoremap <Up>    <nop>
+  "inoremap <Right> <nop>
+
       " Replace all occurences of word under cursor
   nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
       " Navigate buffers quickly
@@ -280,23 +300,36 @@ endif
   function! SwitchHeaderToSource()
       if expand('%:e') == 'h' || expand('%:e') == 'hpp'
           if filereadable(expand('%:r').'.cpp')
-              execute ':edit '.expand('%:r').'.cpp'
+              execute ':find '.expand('%:r').'.cpp'
           elseif filereadable(expand('%:r').'.cc')
-              execute ':edit '.expand('%:r').'.cc'
+              execute ':find '.expand('%:r').'.cc'
           elseif filereadable(expand('%:r').'.c')
-              execute ':edit '.expand('%:r').'.c'
+              execute ':find '.expand('%:r').'.c'
           else
               echo "Source file doesn't exist"
           endif
       elseif expand('%:e') == 'c' || expand('%:e') == 'cpp' || expand('%:e') == 'cc'
           if filereadable(expand('%:r').'.hpp')
-              execute ':edit '.expand('%:r').'.hpp'
+              execute ':find '.expand('%:r').'.hpp'
           elseif filereadable(expand('%:r').'.h')
-              execute ':edit '.expand('%:r').'.h'
+              execute ':find '.expand('%:r').'.h'
           else
               echo "Source file doesn't exist"
           endif
 
 
       endif
+  endfunction
+
+
+  " Lightline
+  function! LightlineFilename()
+    let filename = expand('%:t') !=# '' ? expand('%:t') : '[No Name]'
+    let modified = &modified ? '+' : ''
+    return filename . modified
+  endfunction
+
+  function! LightlineMode()
+    return &filetype ==# 'gitcommit' ? 'Git' :
+          \lightline#mode()
   endfunction
