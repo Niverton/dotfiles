@@ -77,8 +77,8 @@ endif
   "let g:ale_lint_on_text_changed = 'never'
   let g:ale_lint_on_insert_leave = 1
       "Remaps
-  nmap <silent> <leader>j <Plug>(ale_previous_wrap)
-  nmap <silent> <leader>k <Plug>(ale_next_wrap)
+  nmap <silent> <leader>k <Plug>(ale_previous_wrap)
+  nmap <silent> <leader>j <Plug>(ale_next_wrap)
 
   "Deoplete
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -102,9 +102,10 @@ endif
         \ 'colorscheme': 'gruvbox',
         \ 'active': {
         \   'left': [ [ 'mode', 'paste' ],
-        \             [ 'gitbranch', 'readonly', 'filename' ] ]
+        \             [ 'spell', 'gitbranch', 'readonly', 'filename' ] ]
         \ },
         \ 'component_function': {
+        \   'spell'    : 'LightlineSpell',
         \   'gitbranch': 'fugitive#head',
         \   'filename' : 'LightlineFilename',
         \   'mode'     : 'LightlineMode',
@@ -162,6 +163,8 @@ endif
 
 " ---------------------------------- SETTINGS ---------------------------------
 
+  " Unmap space for use as leader
+  nnoremap <Space> <nop>
   let g:mapleader="\<Space>"
   "set tabstop=8           " Tab size
   set shiftwidth=2        " Indent size
@@ -225,11 +228,9 @@ endif
     " (http://vim.wikia.com/wiki/Remove_unwanted_spaces)
   command! Trim :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
       "Insert new line
-  "nmap OO O<Esc>j
-  "nmap oo o<Esc>k
+  nmap <leader>O O<Esc>j
+  nmap <leader>o o<Esc>k
   
-  " Unmap space for use as leader
-  nnoremap <Space> <nop>
 
   nnoremap j gj
   nnoremap k gk
@@ -270,10 +271,10 @@ endif
   inoremap <A-j> <C-\><C-N><C-w>j
   inoremap <A-k> <C-\><C-N><C-w>k
   inoremap <A-l> <C-\><C-N><C-w>l
-  nnoremap <A-h> <C-w>h
-  nnoremap <A-j> <C-w>j
-  nnoremap <A-k> <C-w>k
-  nnoremap <A-l> <C-w>l
+  "nnoremap <A-h> <C-w>h
+  "nnoremap <A-j> <C-w>j
+  "nnoremap <A-k> <C-w>k
+  "nnoremap <A-l> <C-w>l
       " Stop using arrow keys
   nnoremap <Left>  <C-w>h
   nnoremap <Down>  <C-w>j
@@ -291,12 +292,14 @@ endif
   nnoremap <C-s> :bprevious<CR>
 
       " Move line
-  nnoremap <A-Up> "mddk"mP
-  nnoremap <A-Down> "mdd"mp
+      " Up
+  nnoremap <A-k> "mddk"mP
+      " Down
+  nnoremap <A-j> "mdd"mp
 
 " ------------------------------ CUSTOM FUNCTIONS -----------------------------
 
-  nnoremap <leader>o :call SwitchHeaderToSource()<CR>
+  nnoremap <leader>h :call SwitchHeaderToSource()<CR>
   function! SwitchHeaderToSource()
       if expand('%:e') == 'h' || expand('%:e') == 'hpp'
           if filereadable(expand('%:r').'.cpp')
@@ -332,4 +335,12 @@ endif
   function! LightlineMode()
     return &filetype ==# 'gitcommit' ? 'Git' :
           \lightline#mode()
+  endfunction
+
+  function! LightlineSpell()
+    if (empty(&spell))
+      return ''
+    else
+      return 'SPELL ' . &spelllang
+    endif
   endfunction
