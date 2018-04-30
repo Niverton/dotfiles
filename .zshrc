@@ -1,4 +1,4 @@
-source ~/workspace/antigen/antigen.zsh
+source /usr/share/zsh/share/antigen.zsh
 antigen init ~/.antigenrc
 
 export TERMINAL=termite
