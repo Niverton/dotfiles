@@ -142,6 +142,10 @@ endif
   "Plug 'honza/vim-snippets'
   Plug 'niverton/niv-snippets'
 
+  " Qt
+    "QML
+  Plug 'peterhoeg/vim-qml'
+
   call plug#end()
 
 " -------------------------------- COLORSCHEME --------------------------------
