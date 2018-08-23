@@ -36,9 +36,9 @@ fi
 setxkbmap fr
 xinput set-prop SynPS/2\ Synaptics\ TouchPad libinput\ Tapping\ Enabled 1
 numlockx on
-#xsetroot -cursor_name left_ptr #Cursor on root is left arrow
+xsetroot -cursor_name left_ptr
 
-#exec startlxde
-#exec awesome
-#exec bspwm
+dunst &
+redshift -l 44.84044:-0.5805 &
+
 exec i3

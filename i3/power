@@ -1,0 +1,20 @@
+#!/usr/bin/bash
+
+if [ -z $@ ]; then
+  echo -en "\x00prompt\x1fpower\n"
+  echo -en "\0urgent\x1f2\n"
+  #echo -en "\0active\x1f0\n"
+
+  echo "Exit"
+  echo "Reboot"
+  echo "Poweroff"
+else 
+  case $1 in 
+    Exit) i3-msg exit
+      ;;
+    Reboot) reboot
+      ;;
+    Poweroff) poweroff
+      ;;
+  esac
+fi

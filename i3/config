@@ -1,11 +1,30 @@
 # i3 config file (v4)
 
+### Workspaces
+
+# create workspace variables
+set $workspace1 "1: "
+set $workspace2 "2: "
+set $workspace3 "3: "
+set $workspace4 "4: "
+set $workspace5 "5: "
+set $workspace6 "6: "
+set $workspace7 "7: "
+set $workspace8 "8: "
+set $workspace9 "9: "
+set $workspace10 "10: "
+
+assign [class="firefox"]        $workspace1
+assign [class="discord"]        $workspace9
+assign [class="Steam"]          $workspace10
+
 ### Startup
-exec --no-startup-id urxvtd
-exec --no-startup-id dunst
+#exec --no-startup-id urxvtd
+#exec --no-startup-id dunst
 #exec --no-startup-id firefox
 #exec --no-startup-id discord
-exec --no-startup-id redshift
+#exec --no-startup-id steam-native
+#exec --no-startup-id redshift -l 44.84044:-0.5805
 
 
 set $wallpaper /usr/share/backgrounds/Arch.png
@@ -21,28 +40,38 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term urxvtc
+#set $term urxvtc
+set $term termite
 # Your preferred application launcher
-set $menu "rofi -show run -color-window \\"#1d1f21, #585858, #585858\\" -color-normal \\"#1d1f21, #d8d8d8, #585858, #d8d8d8, #1d1f21\\" -color-active \\"#1d1f21, #f7ca88, #585858, #f7ca88, #1d1f21\\" -color-urgent \\"#1d1f21, #ab4642, #585858, #ab4642, #d8d8d8\\""
+set $menu "rofi -show run"
+set $window "rofi -show window"
+set $power_menu "rofi -show fb -modi fb:$HOME/.config/i3/power"
 #set $menu dmenu_run -fn monospace:11
 set $lock .config/i3/lock.sh
 exec --no-startup-id xss-lock $lock
 
-font pango:monospace 10
+#Update i3blocks
+set $bar_update1 pkill -RTMIN+1 i3blocks
+set $bar_update2 pkill -RTMIN+2 i3blocks
+
+#font pango:monospace 10
+font pango:FontAwesome, Hack
 
 ### Key bindings
 #
 # Special
 #
 
-  bindsym XF86AudioLowerVolume exec amixer -q set Master 5%-
-  bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+
-  bindsym Shift+XF86AudioLowerVolume exec amixer -q set Master 10%-
-  bindsym Shift+XF86AudioRaiseVolume exec amixer -q set Master 10%+
-  bindsym XF86AudioMute exec amixer -q set Master toggle
+  bindsym XF86AudioLowerVolume exec amixer -q set Master 5%- && $bar_update1
+  bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ && $bar_update1
+  bindsym Shift+XF86AudioLowerVolume exec amixer -q set Master 10%- && $bar_update1
+  bindsym Shift+XF86AudioRaiseVolume exec amixer -q set Master 10%+ && $bar_update1
+  bindsym XF86AudioMute exec amixer -q set Master toggle && $bar_update1
 
-  #bindsym XF86MonBrightnessUp exec brightnessctl s 10%+
-  #bindsym XF86MonBrightnessDown exec brightnessctl s 10%-
+  bindsym XF86MonBrightnessUp exec brightnessctl s 5%+ && $bar_update2
+  bindsym XF86MonBrightnessDown exec brightnessctl s 5%- && $bar_update2
+  bindsym Shift+XF86MonBrightnessUp exec brightnessctl s 10%+ && $bar_update2
+  bindsym Shift+XF86MonBrightnessDown exec brightnessctl s 10%- && $bar_update2
 
 # Basics:
 #
@@ -60,6 +89,7 @@ font pango:monospace 10
 
     # start your launcher
     bindsym $mod+d exec $menu
+    bindsym $mod+Shift+d exec $window
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -71,8 +101,8 @@ font pango:monospace 10
     # reload the configuration file
     bindsym $mod+Shift+c reload
 
-    # exit sway (logs you out of your wayland session)
-    bindsym $mod+Shift+e exit
+    # exit i3
+    bindsym $mod+Shift+e exec $power_menu
 #
 # Moving around:
 #
@@ -102,27 +132,27 @@ font pango:monospace 10
 #
     # switch to workspace
     # ampersand,eacute,quotedbl,apostrophe,parenleft,section,egrave,exclam,ccedilla,agrave
-    bindsym $mod+ampersand  workspace 1
-    bindsym $mod+eacute     workspace 2
-    bindsym $mod+quotedbl   workspace 3
-    bindsym $mod+apostrophe workspace 4
-    bindsym $mod+parenleft  workspace 5
-    bindsym $mod+minus      workspace 6
-    bindsym $mod+egrave     workspace 7
-    bindsym $mod+underscore workspace 8
-    bindsym $mod+ccedilla   workspace 9
-    bindsym $mod+agrave     workspace 10
+    bindsym $mod+ampersand  workspace $workspace1
+    bindsym $mod+eacute     workspace $workspace2
+    bindsym $mod+quotedbl   workspace $workspace3
+    bindsym $mod+apostrophe workspace $workspace4
+    bindsym $mod+parenleft  workspace $workspace5
+    bindsym $mod+minus      workspace $workspace6
+    bindsym $mod+egrave     workspace $workspace7
+    bindsym $mod+underscore workspace $workspace8
+    bindsym $mod+ccedilla   workspace $workspace9
+    bindsym $mod+agrave     workspace $workspace10
     # move focused container to workspace
-    bindsym $mod+Shift+ampersand  move container to workspace 1
-    bindsym $mod+Shift+eacute     move container to workspace 2
-    bindsym $mod+Shift+quotedbl   move container to workspace 3
-    bindsym $mod+Shift+apostrophe move container to workspace 4
-    bindsym $mod+Shift+parenleft  move container to workspace 5
-    bindsym $mod+Shift+minus      move container to workspace 6
-    bindsym $mod+Shift+egrave     move container to workspace 7
-    bindsym $mod+Shift+underscore move container to workspace 8
-    bindsym $mod+Shift+ccedilla   move container to workspace 9
-    bindsym $mod+Shift+agrave     move container to workspace 10
+    bindsym $mod+Shift+ampersand  move container to workspace $workspace1
+    bindsym $mod+Shift+eacute     move container to workspace $workspace2
+    bindsym $mod+Shift+quotedbl   move container to workspace $workspace3
+    bindsym $mod+Shift+apostrophe move container to workspace $workspace4
+    bindsym $mod+Shift+parenleft  move container to workspace $workspace5
+    bindsym $mod+Shift+minus      move container to workspace $workspace6
+    bindsym $mod+Shift+egrave     move container to workspace $workspace7
+    bindsym $mod+Shift+underscore move container to workspace $workspace8
+    bindsym $mod+Shift+ccedilla   move container to workspace $workspace9
+    bindsym $mod+Shift+agrave     move container to workspace $workspace10
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
 #
@@ -153,7 +183,7 @@ font pango:monospace 10
 #
 # Scratchpad:
 #
-    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # i3 has a "scratchpad", which is a bag of holding for windows.
     # You can send windows there and get them back later.
 
     # Move the currently focused window to the scratchpad
@@ -223,16 +253,27 @@ mode "$screen_mode" {
 }
 bindsym $mod+o mode "$screen_mode"
 
+# Colors
+
+# class                 border  backgr. text    indicator child_border
+client.focused          #504945 #32302f #83a598 #282828   #504945
+client.focused_inactive #3c3836 #32302f #fbdbb2 #282828   #3c3836
+client.unfocused        #3c3836 #32302f #7c6f64 #282828   #3c3836
+client.urgent #cc241d #cc241d #fbdbb2 #282828 #282828
+
 # Status Bar:
-#
-# Read `man 5 sway-bar` for more information about this section.
 bar {
     position top
     colors {
-        statusline #ffffff
-        background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
+        background #282828
+        statusline #ebdbb2
+	separator #928374
+        #                       border  bg      text
+        focused_workspace       #83a598 #83a598 #282828
+        active_workspace        #7c6f64 #7c6f64 #282828
+        inactive_workspace      #282828 #282828 #ebdbb2
+        urgent_workspace        #cc241d #cc241d #ebdbb2
     }
-    status_command i3status
+    status_command i3blocks
 }
 

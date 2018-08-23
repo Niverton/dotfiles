@@ -1,0 +1,25 @@
+#!/bin/bash
+#vim: ft=sh, tw=0
+
+set -e
+
+volume_off=''
+volume_down=''
+volume_up=''
+
+low=30
+zero=0
+
+data=$(amixer get Master | tail -1 | awk '{gsub(/\[|\]|%/,""); print $4 " " $6;}')
+read volume mute <<< $data
+
+icon=''
+if [ $mute = 'off' ] || [ $volume = $zero ]; then
+  icon=$volume_off
+elif [ $volume -lt $low ]; then
+  icon=$volume_down
+elif [ $volume -gt $low ]; then
+  icon=$volume_up
+fi
+
+echo $icon $volume
