@@ -22,6 +22,7 @@ endif
   Plug 'tpope/vim-endwise'
   Plug 'tpope/vim-ragtag'
   Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-repeat'
 
   "Comment
   Plug 'tpope/vim-commentary'
@@ -42,26 +43,43 @@ endif
   "
   Plug 'plasticboy/vim-markdown'
 
-  " Asynchronous Lint Engine
+  " ALE
   Plug 'w0rp/ale'
   "Config
-  let g:ale_echo_msg_format = '%severity% [%linter%]% code%: %s'
+  "let g:ale_completion_enabled          = 1
+  "let g:ale_completion_max_suggestions  = 5
+  set completeopt=menu,menuone,preview,noselect,noinsert
+  let g:ale_echo_msg_format             = '%severity% [%linter%]% code%: %s'
   let g:ale_linters = {
   \     'cpp':  ['clang',
-  \             'clangtidy',
-  \             'cppcheck',
-  \             'clang-format'],
+  \              'clangtidy',
+  \              'cppcheck'],
   \     'c':    ['clang',
-  \             'clangtidy',
-  \             'clang-format'],
+  \              'clangtidy'],
+  \     'python': 'all'
   \}
   let g:ale_fixers = {
-  \     'cpp':  ['clangtidy',
-  \             'clang-format'],
-  \     'c':    ['clangtidy',
-  \             'clang-format'],
+  \     '*':            ['remove_trailing_lines',
+  \                      'trim_whitespace'],
+  \     'cpp':          ['clang-format'],
+  \     'c':            ['clang-format'],
+  \     'javascript':   ['prettier'],
+  \     'python':       ['yapf'],
+  \     'c#':           ['uncrustify'],
   \}
-  let g:ale_c_build_dir_names = ['build', 'bin', 'debug', 'release']
+  let g:ale_c_build_dir_names   = ['build', 'bin', 'debug', 'release']
+  let g:ale_c_clang_options     = '-std=c99 -Wall -I./include -I../include'
+  let g:ale_cpp_clang_options   = '-std=c++17 -Wall -I./include -I../include'
+  let g:ale_c_clangtidy_checks  = [
+  \     '*',
+  \     '-android*',
+  \     '-google*',
+  \     '-fuchsia*',
+  \     '-llvm-header-guard',
+  \     '-cppcoreguidelines-pro-type-union-access',
+  \     '-cppcoreguidelines-pro-bounds-array-to-pointer-decay',
+  \     '-hicpp-no-array-decay'
+  \]
   let g:ale_cpp_clangtidy_checks = [
   \     '*',
   \     '-android*',
@@ -72,24 +90,52 @@ endif
   \     '-cppcoreguidelines-pro-bounds-array-to-pointer-decay',
   \     '-hicpp-no-array-decay'
   \]
-  let g:ale_cpp_cppcheck_options = '--enable=warning,performance,information,style'
+  let g:ale_cpp_clangtidy_options = '-str=c++17'
+  let g:ale_cpp_cppcheck_options  = '--enable=warning,performance,information,style'
+  let g:ale_c_clangformat_options =
+      \ '-fallback-style=llvm ' .
+      \ '-style=file'
+      "\ '-style="{' .
+      "\         'BasedOnStyle: llvm, ' .
+      "\         'AlwaysBreakTemplateDeclarations: true, ' .
+      "\         '}" '
 
   "let g:ale_lint_on_text_changed = 'never'
-  let g:ale_lint_on_insert_leave = 1
-      "Remaps
-  nmap <silent> <leader>k <Plug>(ale_previous_wrap)
-  nmap <silent> <leader>j <Plug>(ale_next_wrap)
+  let g:ale_lint_on_insert_leave        = 1
+  let g:ale_set_balloons                = 1
+  "let g:ale_cursor_detail               = 1
+  "let g:ale_close_preview_on_insert     = 1
+  let g:ale_fix_on_save                 = 1
 
-  "Deoplete
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  Plug 'zchee/deoplete-clang'
+      "Remaps
+  nmap <silent> <A-k>           <Plug>(ale_previous_wrap)
+  nmap <silent> <A-j>           <Plug>(ale_next_wrap)
+  noremap       <leader>g       :ALEGoToDefinition
+  noremap       <leader>tg      :ALEGoToDefinitionInTab
+  noremap       <leader>r       :ALEFindReferences
+
+  " Echo doc
+  Plug 'Shougo/echodoc.vim'
+
+  " Deoplete
+  if has('nvim')
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+  else
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+  endif
   let g:deoplete#enable_at_startup = 1
+
+  "Deoplete sources
+  Plug 'zchee/deoplete-clang'
   let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
   let g:deoplete#sources#clang#clang_header = '/usr/include/clang'
-    "Complete from included files
   Plug 'Shougo/neoinclude.vim'
-    "Use echo bar for documentation
-  Plug 'Shougo/echodoc.vim'
+  Plug 'Shougo/neco-syntax'
+
+  " Tags
+  Plug 'jsfaint/gen_tags.vim'
 
   " Git
   Plug 'tpope/vim-fugitive'
@@ -97,7 +143,6 @@ endif
 
   " LightLine
   Plug 'itchyny/lightline.vim'
-  Plug 'hanschen/lightline-gruvbox.vim'
   let g:lightline = {
         \ 'colorscheme': 'gruvbox',
         \ 'active': {
@@ -112,33 +157,16 @@ endif
         \ },
         \ }
 
-
-  " Clang Format
-  Plug 'rhysd/vim-clang-format'
-  " Look for style file
-  let g:clang_format#detect_style_file = 1
-  " Default style
-  let g:clang_format#code_style = 'llvm'
-  let g:clang_format#style_options = {
-      \ 'AlwaysBreakTemplateDeclarations' : 'true',
-      \ 'Standard' : 'C++11',
-      \}
-  " Auto enable
-  "autocmd FileType c,cpp,objc ClangFormatAutoEnable
-  " Leader + f
-  autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
-  autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
-
   " GLSL
   Plug 'tikhomirov/vim-glsl'
 
   " Latex
   "Plug 'vim-latex/vim-latex'
-  
+
 
   " Snippets
   Plug 'SirVer/ultisnips'
-  let g:UltiSnipsEditSplit="context"
+  let g:UltiSnipsEditSplit='context'
   "Plug 'honza/vim-snippets'
   Plug 'niverton/niv-snippets'
 
@@ -146,19 +174,21 @@ endif
     "QML
   Plug 'peterhoeg/vim-qml'
 
+  "Plug 'aurieh/discord.nvim', { 'do': ':UpdateRemotePlugins'}
+
   call plug#end()
 
 " -------------------------------- COLORSCHEME --------------------------------
 
-  "Set the background according to time of day
-  "let time = str2nr(system("date +%-H"))
+  ""Set the background according to time of day
+  "let time = str2nr(system('date +%-H'))
   "if time >= 18 || time < 8
   "  set background=dark
   "else
   "  set background=light
   "endif
   "unlet time
-  "
+
   set background=dark
 
   " Enable true color support
@@ -170,16 +200,15 @@ endif
   " Unmap space for use as leader
   nnoremap <Space> <nop>
   let g:mapleader="\<Space>"
-  "set tabstop=8           " Tab size
-  set shiftwidth=2        " Indent size
-  "set softtabstop=8       " see help
-  set expandtab           " Use spaces instead of tabs
-  "set number             " Display line numbers
-  set textwidth=72        " Line wrap at 72 chars
-  set cursorline          " highlight cursor line
+  set tabstop=8                 " Tab size
+  set shiftwidth=2              " Indent size
+  set expandtab                 " Use spaces instead of tabs
+  "set number                    " Display line numbers
+  set textwidth=72              " Line wrap at 72 chars
+  set cursorline                " highlight cursor line
   set mouse=a
   filetype indent on
-  set lazyredraw          " Redraw screen only when needed
+  set lazyredraw                " Redraw screen only when needed
   set noshowmode
   set showmatch
   set autoread
@@ -230,26 +259,26 @@ endif
 
     " Remove trailing whitespaces
     " (http://vim.wikia.com/wiki/Remove_unwanted_spaces)
-  command! Trim :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
+  "command! Trim :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
       "Insert new line
   nmap <leader>O O<Esc>j
   nmap <leader>o o<Esc>k
-  
+
 
   nnoremap j gj
   nnoremap k gk
     " Make
-  nnoremap <leader>m :make<CR>
+  "nnoremap <leader>m :make<CR>
 
     "List buffers and prompt
-  nnoremap <leader>b :ls<CR>:buffer 
+  nnoremap <leader>b :ls<CR>:buffer
     "List tabs and switch
-  nnoremap <leader>v :tabs<CR>:tabnext 
+  nnoremap <leader>v :tabs<CR>:tabnext
 
       " ctags -R .
   "nnoremap <leader>m !ctags -R .<CR>
-  command! Ctags :silent !ctags -R .
-  command! Cpptags :silent !ctags -R . --c++-kinds=+p --fields=+iaS --extras=+q
+  "command! Ctags :silent !ctags -R .
+  "command! Cpptags :silent !ctags -R . --c++-kinds=+p --fields=+iaS --extras=+q
 
       " Re-execute previous command prepending bang (!)
   nnoremap <leader>! :<Up><Home>!<CR>
@@ -280,10 +309,10 @@ endif
   "nnoremap <A-k> <C-w>k
   "nnoremap <A-l> <C-w>l
       " Stop using arrow keys
-  nnoremap <Left>  <C-w>h
-  nnoremap <Down>  <C-w>j
-  nnoremap <Up>    <C-w>k
-  nnoremap <Right> <C-w>l
+  "nnoremap <Left>  <C-w>h
+  "nnoremap <Down>  <C-w>j
+  "nnoremap <Up>    <C-w>k
+  "nnoremap <Right> <C-w>l
   "inoremap <Left>  <nop>
   "inoremap <Down>  <nop>
   "inoremap <Up>    <nop>
@@ -297,9 +326,9 @@ endif
 
       " Move line
       " Up
-  nnoremap <A-k> "mddk"mP
-      " Down
-  nnoremap <A-j> "mdd"mp
+  "nnoremap <A-k> "mddk"mP
+  "    " Down
+  "nnoremap <A-j> "mdd"mp
 
 " ------------------------------ CUSTOM FUNCTIONS -----------------------------
 
