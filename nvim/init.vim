@@ -1,5 +1,6 @@
 scriptencoding=utf-8
 " ------------------------------- PLUGIN SECTION ------------------------------
+" Auto download VimPlug if not available
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -8,143 +9,50 @@ endif
 
   call plug#begin('~/.local/share/nvim/plugged')
 
-  " Gruvbox
-  Plug 'morhetz/gruvbox'
-    let g:gruvbox_contrast_dark='medium'
-    let g:gruvbox_contrast_light='hard'
-    let g:gruvbox_inverse='1'
-    let g:gruvbox_italic='1'
+  " ############## Python support ##########
 
-  " Session manager
-  Plug 'tpope/vim-obsession'
+    " Don't forget to run :PythonSupportInitPython3
+    " Python modules manager
+    Plug 'roxma/python-support.nvim'
+    let g:python_support_python2_require = 0
 
-  "Auto close tags
-  Plug 'tpope/vim-endwise'
-  Plug 'tpope/vim-ragtag'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-repeat'
+    " for python completions
+    let g:python_support_python3_requirements =
+          \ add(get(g:,'python_support_python3_requirements',[]),'jedi')
+    " language specific completions on markdown file
+    let g:python_support_python3_requirements = 
+          \ add(get(g:,'python_support_python3_requirements',[]),'mistune')
+    " utils, optional
+    let g:python_support_python3_requirements = 
+          \ add(get(g:,'python_support_python3_requirements',[]),'psutil')
+    let g:python_support_python3_requirements = 
+          \ add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
-  "Comment
-  Plug 'tpope/vim-commentary'
+  " ########################################
 
-  " Python modules manager
-  Plug 'roxma/python-support.nvim'
-  let g:python_support_python2_require = 0
+  " Themes
+    let s:active_theme = 'gruvbox'
 
-  " for python completions
-  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'jedi')
-  " language specific completions on markdown file
-  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'mistune')
-
-  " utils, optional
-  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'psutil')
-  let g:python_support_python3_requirements = add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
-
-  "
-  Plug 'plasticboy/vim-markdown'
-
-  " ALE
-  Plug 'w0rp/ale'
-  "Config
-  "let g:ale_completion_enabled          = 1
-  "let g:ale_completion_max_suggestions  = 5
-  set completeopt=menu,menuone,preview,noselect,noinsert
-  let g:ale_echo_msg_format             = '%severity% [%linter%]% code%: %s'
-  let g:ale_linters = {
-  \     'cpp':  ['clang',
-  \              'clangtidy',
-  \              'cppcheck'],
-  \     'c':    ['clang',
-  \              'clangtidy'],
-  \     'python': 'all'
-  \}
-  let g:ale_fixers = {
-  \     '*':            ['remove_trailing_lines',
-  \                      'trim_whitespace'],
-  \     'cpp':          ['clang-format'],
-  \     'c':            ['clang-format'],
-  \     'javascript':   ['prettier'],
-  \     'python':       ['yapf'],
-  \     'c#':           ['uncrustify'],
-  \}
-  let g:ale_c_build_dir_names   = ['build', 'bin', 'debug', 'release']
-  let g:ale_c_clang_options     = '-std=c99 -Wall -I./include -I../include'
-  let g:ale_cpp_clang_options   = '-std=c++17 -Wall -I./include -I../include'
-  let g:ale_c_clangtidy_checks  = [
-  \     '*',
-  \     '-android*',
-  \     '-google*',
-  \     '-fuchsia*',
-  \     '-llvm-header-guard',
-  \     '-cppcoreguidelines-pro-type-union-access',
-  \     '-cppcoreguidelines-pro-bounds-array-to-pointer-decay',
-  \     '-hicpp-no-array-decay'
-  \]
-  let g:ale_cpp_clangtidy_checks = [
-  \     '*',
-  \     '-android*',
-  \     '-google*',
-  \     '-fuchsia*',
-  \     '-llvm-header-guard',
-  \     '-cppcoreguidelines-pro-type-union-access',
-  \     '-cppcoreguidelines-pro-bounds-array-to-pointer-decay',
-  \     '-hicpp-no-array-decay'
-  \]
-  let g:ale_cpp_clangtidy_options = '-str=c++17'
-  let g:ale_cpp_cppcheck_options  = '--enable=warning,performance,information,style'
-  let g:ale_c_clangformat_options =
-      \ '-fallback-style=llvm ' .
-      \ '-style=file'
-      "\ '-style="{' .
-      "\         'BasedOnStyle: llvm, ' .
-      "\         'AlwaysBreakTemplateDeclarations: true, ' .
-      "\         '}" '
-
-  "let g:ale_lint_on_text_changed = 'never'
-  let g:ale_lint_on_insert_leave        = 1
-  let g:ale_set_balloons                = 1
-  "let g:ale_cursor_detail               = 1
-  "let g:ale_close_preview_on_insert     = 1
-  let g:ale_fix_on_save                 = 1
-
-      "Remaps
-  nmap <silent> <A-k>           <Plug>(ale_previous_wrap)
-  nmap <silent> <A-j>           <Plug>(ale_next_wrap)
-  noremap       <leader>g       :ALEGoToDefinition
-  noremap       <leader>tg      :ALEGoToDefinitionInTab
-  noremap       <leader>r       :ALEFindReferences
-
-  " Echo doc
-  Plug 'Shougo/echodoc.vim'
-
-  " Deoplete
-  if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  else
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-  endif
-  let g:deoplete#enable_at_startup = 1
-
-  "Deoplete sources
-  Plug 'zchee/deoplete-clang'
-  let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
-  let g:deoplete#sources#clang#clang_header = '/usr/include/clang'
-  Plug 'Shougo/neoinclude.vim'
-  Plug 'Shougo/neco-syntax'
-
-  " Tags
-  Plug 'jsfaint/gen_tags.vim'
-
-  " Git
-  Plug 'tpope/vim-fugitive'
-  Plug 'tpope/vim-rhubarb'
+    if s:active_theme ==? 'gruvbox'
+    " Gruvbox
+      Plug 'morhetz/gruvbox'
+        let g:gruvbox_contrast_dark='medium'
+        let g:gruvbox_contrast_light='hard'
+        let g:gruvbox_inverse='1'
+        let g:gruvbox_italic='1'
+    elseif s:active_theme ==? 'nord'
+    " Nord
+      Plug 'arcticicestudio/nord-vim'
+        let g:nord_italic = 1
+        let g:nord_underline = 1
+        let g:nord_cursor_line_number_background = 1
+        let g:nord_comment_brightness = 10
+    end
 
   " LightLine
   Plug 'itchyny/lightline.vim'
   let g:lightline = {
-        \ 'colorscheme': 'gruvbox',
+        \ 'colorscheme': s:active_theme,
         \ 'active': {
         \   'left': [ [ 'mode', 'paste' ],
         \             [ 'spell', 'gitbranch', 'readonly', 'filename' ] ]
@@ -157,22 +65,97 @@ endif
         \ },
         \ }
 
-  " GLSL
-  Plug 'tikhomirov/vim-glsl'
+  "VimWiki
+  Plug 'vimwiki/vimwiki'
 
-  " Latex
-  "Plug 'vim-latex/vim-latex'
+  " Session manager
+  Plug 'tpope/vim-obsession'
 
+  "Auto close tags
+  Plug 'tpope/vim-endwise'
+  Plug 'tpope/vim-ragtag'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-repeat'
 
-  " Snippets
-  Plug 'SirVer/ultisnips'
-  let g:UltiSnipsEditSplit='context'
-  "Plug 'honza/vim-snippets'
-  Plug 'niverton/niv-snippets'
+  "Comments
+  Plug 'tpope/vim-commentary'
 
-  " Qt
-    "QML
-  Plug 'peterhoeg/vim-qml'
+  " Git
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-rhubarb'
+
+  "############### Languages ###############
+    " Markdown
+    Plug 'plasticboy/vim-markdown'
+    " GLSL
+    Plug 'tikhomirov/vim-glsl'
+    " Latex
+    " Plug 'vim-latex/vim-latex'
+    " Qt
+    " Plug 'peterhoeg/vim-qml'
+
+  " ############## Auto Completion #########
+    " FZF (requires fzf installed globally)
+    Plug '/usr/local/opt/fzf'
+    Plug 'junegunn/fzf.vim'
+    nnoremap <leader>f :FZF<CR>
+    " LSP
+    Plug 'autozimu/LanguageClient-neovim', {
+        \ 'branch': 'next',
+        \ 'do': 'bash install.sh',
+        \ }
+    let g:LanguageClient_serverCommands = {
+        \ 'rust': ['rustup', 'run', 'stable', 'rls'],
+        \ 'python': ['pyls'],
+        \ 'c': ['ccls'],
+        \ 'cpp': ['ccls'],
+        \ }
+
+    function SetLSPShortcuts()
+      nnoremap <leader>ld :call LanguageClient#textDocument_definition()<CR>
+      nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
+      nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
+      nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
+      nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
+      nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
+      nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
+      nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
+      nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
+      nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
+    endfunction()
+
+    augroup LSP
+      autocmd!
+      autocmd FileType cpp,c,rust,python call SetLSPShortcuts()
+      autocmd User LanguageClientStarted setlocal signcolumn=yes
+      autocmd User LanguageClientStopped setlocal signcolumn=auto
+    augroup END
+
+    " Deoplete 
+    if has('nvim')
+      Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    else
+      Plug 'Shougo/deoplete.nvim'
+      Plug 'roxma/nvim-yarp'
+      Plug 'roxma/vim-hug-neovim-rpc'
+    endif
+
+    let g:deoplete#enable_at_startup = 1
+    " call deoplete#custom#source('LanguageClient',
+    "         \ 'min_pattern_length',
+    "         \ 2)
+
+    Plug 'Shougo/echodoc.vim'
+    set cmdheight=2
+    let g:echodoc#enable_at_startup = 1
+    let g:echodoc#type = 'signature'
+
+    " Snippets
+    Plug 'SirVer/ultisnips'
+    let g:UltiSnipsEditSplit='context'
+    let g:UltiSnipsExpandTrigger='<c-j>'
+    Plug 'honza/vim-snippets'
+    Plug 'niverton/niv-snippets'
 
   "Plug 'aurieh/discord.nvim', { 'do': ':UpdateRemotePlugins'}
 
@@ -193,9 +176,12 @@ endif
 
   " Enable true color support
   set termguicolors
-  colorscheme gruvbox
+  execute 'colorscheme ' . s:active_theme
 
 " ---------------------------------- SETTINGS ---------------------------------
+
+  " Disable default rustmode 'style preference' (tw=99, sw=4)
+  let g:rust_recommended_style = 0
 
   " Unmap space for use as leader
   nnoremap <Space> <nop>
@@ -203,8 +189,10 @@ endif
   set tabstop=8                 " Tab size
   set shiftwidth=2              " Indent size
   set expandtab                 " Use spaces instead of tabs
-  "set number                    " Display line numbers
-  set textwidth=72              " Line wrap at 72 chars
+  set number                    " Display line numbers
+  " Disable in terminal
+  au TermOpen * setlocal nonumber
+  set textwidth=80              " Line wrap
   set cursorline                " highlight cursor line
   set mouse=a
   filetype indent on
@@ -225,13 +213,14 @@ endif
   set foldenable
   set foldlevelstart=10
   set foldnestmax=10
-  set foldmethod=indent
+  set foldmethod=syntax
   "Toggle fold
   "nnoremap <space> za
 
 
 " -------------------------------- SPELL CHECK --------------------------------
 
+  " TODO fix this, investigate
   highlight clear SpellBad
   highlight SpellBad cterm=underline
   command! SpellCheckEng :setlocal spell spelllang=en
@@ -243,10 +232,11 @@ endif
   set wildmenu
   set wildignorecase
   " ignore these files when completing names and in Ex
-  set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam
+  " TODO test for build,release,debug
+  set wildignore=build,release,debug,.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam
   " set of file name suffixes that will be given a lower priority when
   " it comes to matching wildcards
-  set suffixes+=.old
+  set suffixes+=.old*
 
 " -------------------------------- NETRW CONFIG -------------------------------
 
@@ -257,13 +247,9 @@ endif
 
 " ----------------------------------- REMAPS ----------------------------------
 
-    " Remove trailing whitespaces
-    " (http://vim.wikia.com/wiki/Remove_unwanted_spaces)
-  "command! Trim :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
-      "Insert new line
+    "Insert new line
   nmap <leader>O O<Esc>j
   nmap <leader>o o<Esc>k
-
 
   nnoremap j gj
   nnoremap k gk
@@ -275,25 +261,9 @@ endif
     "List tabs and switch
   nnoremap <leader>v :tabs<CR>:tabnext
 
-      " ctags -R .
-  "nnoremap <leader>m !ctags -R .<CR>
-  "command! Ctags :silent !ctags -R .
-  "command! Cpptags :silent !ctags -R . --c++-kinds=+p --fields=+iaS --extras=+q
-
-      " Re-execute previous command prepending bang (!)
-  nnoremap <leader>! :<Up><Home>!<CR>
-
-      " Save file as root
-          " Write buffer to tee standard input, dump the output and save it to
-          " file.
-  cnoremap w!! w !sudo tee % > /dev/null %
-
       " Nohl && close preview window
   nnoremap <leader><leader> :nohl<CR>:pc<CR>
 
-      " Nonumber
-  let g:numberstatus=0
-  nnoremap <silent> <leader>n :if (numberstatus%2 == 0) \| set number \| else \| set nonumber \| endif \| let numberstatus=numberstatus+1<cr>
       " Normal mode from terminal mode
   tnoremap <Esc> <C-\><C-n>
   tnoremap <A-h> <C-\><C-N><C-w>h
@@ -331,32 +301,6 @@ endif
   "nnoremap <A-j> "mdd"mp
 
 " ------------------------------ CUSTOM FUNCTIONS -----------------------------
-
-  nnoremap <leader>h :call SwitchHeaderToSource()<CR>
-  function! SwitchHeaderToSource()
-      if expand('%:e') == 'h' || expand('%:e') == 'hpp'
-          if filereadable(expand('%:r').'.cpp')
-              execute ':find '.expand('%:r').'.cpp'
-          elseif filereadable(expand('%:r').'.cc')
-              execute ':find '.expand('%:r').'.cc'
-          elseif filereadable(expand('%:r').'.c')
-              execute ':find '.expand('%:r').'.c'
-          else
-              echo "Source file doesn't exist"
-          endif
-      elseif expand('%:e') == 'c' || expand('%:e') == 'cpp' || expand('%:e') == 'cc'
-          if filereadable(expand('%:r').'.hpp')
-              execute ':find '.expand('%:r').'.hpp'
-          elseif filereadable(expand('%:r').'.h')
-              execute ':find '.expand('%:r').'.h'
-          else
-              echo "Source file doesn't exist"
-          endif
-
-
-      endif
-  endfunction
-
 
   " Lightline
   function! LightlineFilename()
