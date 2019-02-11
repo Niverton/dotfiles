@@ -20,12 +20,12 @@ endif
     let g:python_support_python3_requirements =
           \ add(get(g:,'python_support_python3_requirements',[]),'jedi')
     " language specific completions on markdown file
-    let g:python_support_python3_requirements = 
+    let g:python_support_python3_requirements =
           \ add(get(g:,'python_support_python3_requirements',[]),'mistune')
     " utils, optional
-    let g:python_support_python3_requirements = 
+    let g:python_support_python3_requirements =
           \ add(get(g:,'python_support_python3_requirements',[]),'psutil')
-    let g:python_support_python3_requirements = 
+    let g:python_support_python3_requirements =
           \ add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
   " ########################################
@@ -102,8 +102,9 @@ endif
     " LSP
     Plug 'autozimu/LanguageClient-neovim', {
         \ 'branch': 'next',
-        \ 'do': 'bash install.sh',
+        \ 'do': 'make release',
         \ }
+        " \ 'do': 'bash install.sh', " Download binary
     let g:LanguageClient_serverCommands = {
         \ 'rust': ['rustup', 'run', 'stable', 'rls'],
         \ 'python': ['pyls'],
@@ -111,7 +112,7 @@ endif
         \ 'cpp': ['ccls'],
         \ }
 
-    function SetLSPShortcuts()
+    function! SetLSPShortcuts()
       nnoremap <leader>ld :call LanguageClient#textDocument_definition()<CR>
       nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
       nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
@@ -131,7 +132,7 @@ endif
       autocmd User LanguageClientStopped setlocal signcolumn=auto
     augroup END
 
-    " Deoplete 
+    " Deoplete
     if has('nvim')
       Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
     else
@@ -190,22 +191,39 @@ endif
   set shiftwidth=2              " Indent size
   set expandtab                 " Use spaces instead of tabs
   set number                    " Display line numbers
-  " Disable in terminal
-  au TermOpen * setlocal nonumber
   set textwidth=80              " Line wrap
   set cursorline                " highlight cursor line
-  set mouse=a
+  set mouse=a                   " Full mouse support
   filetype indent on
   set lazyredraw                " Redraw screen only when needed
-  set noshowmode
-  set showmatch
-  set autoread
+  set noshowmode                " Hide mode in echo bar
+  set showmatch                 " Highlight pairs
+  set noequalalways             " Don't resize all windows when layout changes
+
+  " Disable in terminal
+  au TermOpen * setlocal nonumber
+  au TermOpen * setlocal nocursorline
+
+  " hightlight whitespaces
+
+  highlight! link ExtraWhitespace Error
+  match ExtraWhitespace /\s\+$/
+  autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+  autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+  autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+  autocmd BufWinLeave * call clearmatches()
+
+  function! TrimWhiteSpace()
+      %s/\s\+$//e
+  endfunction
+
+  command! TrimWhiteSpace call TrimWhiteSpace()
 
 " ----------------------------------- SEARCH ----------------------------------
 
   set ignorecase
   set smartcase
-  set incsearch           "Search when typing
+  set incsearch                 " Search when typing
   set hlsearch
 
 " ---------------------------------- FOLDING ----------------------------------
