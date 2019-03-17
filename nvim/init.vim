@@ -113,6 +113,8 @@ Plug 'tikhomirov/vim-glsl'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 nnoremap <leader>f :FZF<CR>
+nnoremap <leader>b :Buffers<CR>
+
 " LSP
 Plug 'autozimu/LanguageClient-neovim', {
         \ 'branch': 'next',
@@ -254,7 +256,7 @@ set hlsearch
 
 " Ripgrep
 if executable('rg')
-    set grepprg=rg\ -n
+    set grepprg=rg\ --vimgrep
 endif
 
 " ---------------------------------- FOLDING ----------------------------------
@@ -303,12 +305,12 @@ nnoremap k gk
 " Make
 "nnoremap <leader>m :make<CR>
 
-"List buffers and prompt
-nnoremap <leader>b :ls<CR>:buffer 
-"List tabs and switch
-nnoremap <leader>v :tabs<CR>:tabnext 
+" List buffers and prompt
+" nnoremap <leader>b :ls<CR>:buffer 
+" List tabs and switch
+" nnoremap <leader>v :tabs<CR>:tabnext 
 
-" Nohl && close preview window
+" Clear search && close preview window
 nnoremap <leader><leader> :pclose<CR>:let @/ = ""<CR>
 
 " Normal mode from terminal mode
@@ -324,15 +326,12 @@ inoremap <A-l> <C-\><C-N><C-w>l
 
 " Replace all occurences of word under cursor
 nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
-" Navigate buffers quickly
-nnoremap <C-q> :bnext<CR>
-nnoremap <C-s> :bprevious<CR>
 
 " ------------------------------ CUSTOM FUNCTIONS -----------------------------
 
 " Lightline
 function! LightlineFilename()
-    let filename=expand('%:t') !=# '' ? expand('%:t') : '[No Name]'
+    let filename=expand('%') !=# '' ? fnamemodify(expand('%'), ':~:.') : '[No Name]'
     let modified=&modified ? '+' : ''
     return filename . modified
 endfunction
