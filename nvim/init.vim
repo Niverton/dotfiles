@@ -54,23 +54,25 @@ Plug 'itchyny/lightline.vim'
 let g:lightline={
         \ 'colorscheme': s:active_theme,
         \ 'active': {
-        \   'left': [ [ 'mode', 'paste' ],
-        \             [ 'spell', 'gitbranch', 'readonly', 'filename' ] ]
+        \       'left': [ [ 'mode', 'paste' ],
+        \               [ 'spell', 'gitbranch', 'readonly', 'filename' ] ],
+        \       'right': [ ['linenum'],
+        \               ['filetype'],
+        \               ['fileencoding'] ],
+        \ },
+        \ 'component': {
+        \       'linenum': '%l/%L:%c',
         \ },
         \ 'component_function': {
-        \   'spell'    : 'LightlineSpell',
-        \   'gitbranch': 'fugitive#head',
-        \   'filename' : 'LightlineFilename',
-        \   'mode'     : 'LightlineMode',
+        \       'spell'    : 'LightlineSpell',
+        \       'gitbranch': 'fugitive#head',
+        \       'filename' : 'LightlineFilename',
+        \       'mode'     : 'LightlineMode',
         \ },
         \ }
 
 " VimWiki
 Plug 'vimwiki/vimwiki'
-" let g:vimwiki_list = [{
-"         \ 'syntax': 'markdown',
-"         \ 'ext'   : '.md'
-"         \}]
 
 " Session manager
 Plug 'tpope/vim-obsession'
@@ -165,7 +167,6 @@ let g:deoplete#enable_at_startup=1
 Plug 'Shougo/echodoc.vim'
 set cmdheight=2
 let g:echodoc#enable_at_startup=1
-let g:echodoc#type='signature'
 
 " Snippets
 Plug 'SirVer/ultisnips'
@@ -251,7 +252,7 @@ command! TrimWhiteSpace call TrimWhiteSpace()
 
 set ignorecase
 set smartcase
-set incsearch                 " Search when typing
+set incsearch   " Search when typing
 set hlsearch
 
 " Ripgrep
@@ -302,13 +303,6 @@ nmap <leader>o o<Esc>k
 
 nnoremap j gj
 nnoremap k gk
-" Make
-"nnoremap <leader>m :make<CR>
-
-" List buffers and prompt
-" nnoremap <leader>b :ls<CR>:buffer 
-" List tabs and switch
-" nnoremap <leader>v :tabs<CR>:tabnext 
 
 " Clear search && close preview window
 nnoremap <leader><leader> :pclose<CR>:let @/ = ""<CR>
