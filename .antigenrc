@@ -18,7 +18,7 @@ antigen bundles <<EOBUNDLES
     MichaelAquilina/zsh-you-should-use
 EOBUNDLES
 
-antigen theme candy
+antigen theme lambda
 
 # Tell antigen that you're done.
 antigen apply
