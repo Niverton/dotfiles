@@ -1,4 +1,9 @@
 scriptencoding=utf-8
+
+" Unmap space to use as leader
+nnoremap <Space> <nop>
+let g:mapleader="\<Space>"
+
 " ------------------------------- PLUGIN SECTION ------------------------------
 " Auto download VimPlug if not available
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
@@ -15,18 +20,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 " Python modules manager
 Plug 'roxma/python-support.nvim'
 let g:python_support_python2_require=0
-
-" for python completions
-let g:python_support_python3_requirements =
-        \ add(get(g:,'python_support_python3_requirements',[]),'jedi')
-" language specific completions on markdown file
-let g:python_support_python3_requirements =
-        \ add(get(g:,'python_support_python3_requirements',[]),'mistune')
-" utils, optional
-let g:python_support_python3_requirements =
-        \ add(get(g:,'python_support_python3_requirements',[]),'psutil')
-let g:python_support_python3_requirements =
-        \ add(get(g:,'python_support_python3_requirements',[]),'setproctitle')
 
 " ########################################
 
@@ -58,16 +51,18 @@ let g:lightline={
         \               [ 'spell', 'gitbranch', 'readonly', 'filename' ] ],
         \       'right': [ ['linenum'],
         \               ['filetype'],
-        \               ['fileencoding'] ],
+        \               ['cocstatus', 'currentfunction', 'fileencoding'] ],
         \ },
         \ 'component': {
         \       'linenum': '%l/%L:%c',
         \ },
         \ 'component_function': {
-        \       'spell'    : 'LightlineSpell',
-        \       'gitbranch': 'fugitive#head',
-        \       'filename' : 'LightlineFilename',
-        \       'mode'     : 'LightlineMode',
+        \       'spell'          : 'LightlineSpell',
+        \       'gitbranch'      : 'fugitive#head',
+        \       'filename'       : 'LightlineFilename',
+        \       'mode'           : 'LightlineMode',
+        \       'cocstatus'      : 'coc#status',
+        \       'currentfunction': 'CocCurrentFunction'
         \ },
         \ }
 
@@ -98,80 +93,61 @@ Plug 'wellle/targets.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 Plug 'shumphrey/fugitive-gitlab.vim'
-let g:fugitive_gitlab_domains = ['https://gitlab.inria.fr/']
 
 "############### Languages ###############
 " Markdown
 Plug 'plasticboy/vim-markdown'
 " GLSL
 Plug 'tikhomirov/vim-glsl'
-" Latex
-" Plug 'vim-latex/vim-latex'
-" Qt
-" Plug 'peterhoeg/vim-qml'
 
 " ############## Auto Completion #########
-" FZF (requires fzf installed globally)
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
-nnoremap <leader>f :FZF<CR>
-nnoremap <leader>b :Buffers<CR>
+" COC
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+let g:coc_global_extensions = [
+            \ 'coc-tag',
+            \ 'coc-syntax',
+            \ 'coc-snippets',
+            \ 'coc-lists',
+            \ 'coc-git',
+            \ 'coc-emoji',
+            \ 'coc-dictionary',
+            \ 'coc-rls',
+            \ 'coc-json',
+            \ ]
+set shortmess+=c
+set updatetime=300
 
-" LSP
-Plug 'autozimu/LanguageClient-neovim', {
-        \ 'branch': 'next',
-        \ 'do'    : 'make release',
-        \ }
-" \ 'do': 'bash install.sh', " Download binary
-let g:LanguageClient_serverCommands={
-        \ 'rust'  : ['rustup', 'run', 'stable', 'rls'],
-        \ 'python': ['pyls'],
-        \ 'c'     : ['ccls'],
-        \ 'cpp'   : ['ccls'],
-        \ }
+augroup COC
+    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+augroup end
 
-function! SetLSPShortcuts()
-    nnoremap <leader>ld :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
-    nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
-    nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
-    nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
-    nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
-    nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
-    nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
-    nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
-    nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
-endfunction()
+" {{{
+    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    inoremap <silent><expr> <c-space> coc#refresh()
 
-augroup LSP
-    autocmd!
-    autocmd FileType cpp,c,rust,python call SetLSPShortcuts()
-    autocmd User LanguageClientStarted setlocal signcolumn=yes
-    autocmd User LanguageClientStopped setlocal signcolumn=auto
-augroup END
+    nnoremap <silent> <leader>f :CocList files<CR>
+    nnoremap <silent> <leader>b :CocList buffers<CR>
 
-" Deoplete
-if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-endif
+    nnoremap <silent> <leader>d <Plug>(coc-definition)
+    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
+    nnoremap <silent> <leader>i <Plug>(coc-implementation)
+    nnoremap <silent> <leader>r <Plug>(coc-references)
 
-let g:deoplete#enable_at_startup=1
-" call deoplete#custom#source('LanguageClient',
-"         \ 'min_pattern_length',
-"         \ 2)
+    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-prev)
+    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-next)
 
-Plug 'Shougo/echodoc.vim'
-set cmdheight=2
-let g:echodoc#enable_at_startup=1
+    nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+    " Remap for rename current word
+    nmap <leader>rn <Plug>(coc-rename)
+
+    " Remap for format selected region
+    vmap <leader>gf  <Plug>(coc-format-selected)
+    nmap <leader>gf  <Plug>(coc-format-selected)
+" }}}
 
 " Snippets
-Plug 'SirVer/ultisnips'
-let g:UltiSnipsEditSplit='context'
-let g:UltiSnipsExpandTrigger='<c-j>'
 Plug 'honza/vim-snippets'
 Plug 'niverton/niv-snippets'
 
@@ -180,15 +156,6 @@ Plug 'niverton/niv-snippets'
 call plug#end()
 
 " -------------------------------- COLORSCHEME --------------------------------
-
-""Set the background according to time of day
-"let time=str2nr(system('date +%-H'))
-"if time >= 18 || time < 8
-"  set background=dark
-"else
-"  set background=light
-"endif
-"unlet time
 
 set background=dark
 
@@ -201,9 +168,6 @@ execute 'colorscheme ' . s:active_theme
 " Disable default rustmode 'style preference' (tw=99, sw=4)
 let g:rust_recommended_style=0
 
-" Unmap space for use as leader
-nnoremap <Space> <nop>
-let g:mapleader="\<Space>"
 set tabstop=8                 " Tab size
 set shiftwidth=4              " Indent size
 set expandtab                 " Use spaces instead of tabs
@@ -217,6 +181,11 @@ set noshowmode                " Hide mode in echo bar
 set showmatch                 " Highlight pairs
 set noequalalways             " Don't resize all windows when layout changes
 set diffopt+=vertical
+set splitbelow
+set splitright
+
+set hidden
+set cmdheight=2
 
 " Terminal mode settings
 augroup TERM
@@ -232,15 +201,16 @@ augroup TERM
     autocmd BufEnter * call TermEnter()
 augroup end
 
-
 " hightlight whitespaces
 
 highlight! link ExtraWhitespace Error
 match ExtraWhitespace /\s\+$/
-autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-autocmd BufWinLeave * call clearmatches()
+augroup WHITESPACE
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
+augroup end
 
 function! TrimWhiteSpace()
     %s/\s\+$//e
@@ -266,17 +236,14 @@ set foldenable
 set foldlevelstart=10
 set foldnestmax=10
 set foldmethod=syntax
-"Toggle fold
-"nnoremap <space> za
-
 
 " -------------------------------- SPELL CHECK --------------------------------
 
 " TODO fix this, investigate
-highlight clear SpellBad
-highlight SpellBad cterm=underline
-command! SpellCheckEng :setlocal spell spelllang=en
-command! SpellCheckFra :setlocal spell spelllang=fr
+" highlight clear SpellBad
+" highlight SpellBad cterm=underline
+" command! SpellCheckEng :setlocal spell spelllang=en
+" command! SpellCheckFra :setlocal spell spelllang=fr
 
 " ----------------------------- FUZZY FILE SEARCH -----------------------------
 
@@ -305,7 +272,7 @@ nnoremap j gj
 nnoremap k gk
 
 " Clear search && close preview window
-nnoremap <leader><leader> :pclose<CR>:let @/ = ""<CR>
+nnoremap <silent> <leader><leader> :pclose<CR>:let @/ = ""<CR>
 
 " Normal mode from terminal mode
 tnoremap <Esc> <C-\><C-n>
@@ -341,4 +308,8 @@ function! LightlineSpell()
     else
         return 'SPELL ' . &spelllang
     endif
+endfunction
+
+function! CocCurrentFunction()
+    return get(b:, 'coc_current_function', '')
 endfunction
