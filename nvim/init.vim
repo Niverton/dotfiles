@@ -9,7 +9,9 @@ let g:mapleader="\<Space>"
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
     silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
             \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup VimPlug
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup END
 endif
 
 call plug#begin('~/.local/share/nvim/plugged')
@@ -51,7 +53,7 @@ let g:lightline={
         \               [ 'spell', 'gitbranch', 'readonly', 'filename' ] ],
         \       'right': [ ['linenum'],
         \               ['filetype'],
-        \               ['cocstatus', 'currentfunction', 'fileencoding'] ],
+        \               ['fileencoding'] ],
         \ },
         \ 'component': {
         \       'linenum': '%l/%L:%c',
@@ -61,8 +63,6 @@ let g:lightline={
         \       'gitbranch'      : 'fugitive#head',
         \       'filename'       : 'LightlineFilename',
         \       'mode'           : 'LightlineMode',
-        \       'cocstatus'      : 'coc#status',
-        \       'currentfunction': 'CocCurrentFunction'
         \ },
         \ }
 
@@ -101,53 +101,47 @@ Plug 'plasticboy/vim-markdown'
 Plug 'tikhomirov/vim-glsl'
 
 " ############## Auto Completion #########
-" COC
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
-let g:coc_global_extensions = [
-            \ 'coc-tag',
-            \ 'coc-syntax',
-            \ 'coc-snippets',
-            \ 'coc-lists',
-            \ 'coc-git',
-            \ 'coc-emoji',
-            \ 'coc-dictionary',
-            \ 'coc-rls',
-            \ 'coc-json',
-            \ ]
 set shortmess+=c
 set updatetime=300
 
-augroup COC
-    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-augroup end
+let g:ale_completion_enabled=1
+Plug 'w0rp/ale'
 
-" {{{
-    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-    inoremap <silent><expr> <c-space> coc#refresh()
+set omnifunc=ale#completion#OmniFunc
+set completeopt=menu,menuone,preview,noselect,noinsert
 
-    nnoremap <silent> <leader>f :CocList files<CR>
-    nnoremap <silent> <leader>b :CocList buffers<CR>
+let g:ale_linters = {
+    \   'rust': ['rls',],
+    \ }
+let g:ale_fixers = {
+    \   'rust': ['rustfmt'],
+    \}
 
-    nnoremap <silent> <leader>d <Plug>(coc-definition)
-    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
-    nnoremap <silent> <leader>i <Plug>(coc-implementation)
-    nnoremap <silent> <leader>r <Plug>(coc-references)
+let g:ale_echo_msg_format         = '%severity% [%linter%]% code%: %s'
+" Rust
+let g:ale_rust_rls_toolchain      = ''
+let g:ale_rust_cargo_use_clippy   = 1
+let g:ale_sign_column_always      = 1
+let g:ale_lint_on_insert_leave    = 1
+let g:ale_close_preview_on_insert = 1
+let g:ale_fix_on_save             = 1
 
-    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-prev)
-    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-next)
-
-    nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-    " Remap for rename current word
-    nmap <leader>rn <Plug>(coc-rename)
-
-    " Remap for format selected region
-    vmap <leader>gf  <Plug>(coc-format-selected)
-    nmap <leader>gf  <Plug>(coc-format-selected)
-" }}}
+" Remaps
+nmap <silent> <A-k>           <Plug>(ale_previous_wrap)
+nmap <silent> <A-j>           <Plug>(ale_next_wrap)
+noremap       <leader>aa       :ALEHover<CR>
+noremap       <leader>as       :ALESymbolSearch<CR>
+noremap       <leader>ad       :ALEDocumentation<CR>
+noremap       <leader>ag       :ALEGoToDefinition<CR>
+noremap       <leader>atg      :ALEGoToDefinitionInTab<CR>
+noremap       <leader>avg      :ALEGoToDefinitionInVSplit<CR>
+noremap       <leader>ar       :ALEFindReferences<CR>
 
 " Snippets
+Plug 'SirVer/ultisnips'
+let g:UltiSnipsExpandTrigger       = '<tab>'
+let g:UltiSnipsJumpForwardTrigger  = '<c-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 Plug 'honza/vim-snippets'
 Plug 'niverton/niv-snippets'
 
@@ -309,6 +303,3 @@ function! LightlineSpell()
     endif
 endfunction
 
-function! CocCurrentFunction()
-    return get(b:, 'coc_current_function', '')
-endfunction
