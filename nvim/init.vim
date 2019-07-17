@@ -28,7 +28,7 @@ let s:active_theme='gruvbox'
 
 if s:active_theme ==? 'gruvbox'
     " Gruvbox
-    Plug 'morhetz/gruvbox'
+    Plug 'gruvbox-community/gruvbox'
     let g:gruvbox_contrast_dark ='medium'
     let g:gruvbox_contrast_light='hard'
     let g:gruvbox_inverse='1'
@@ -245,9 +245,8 @@ set foldmethod=syntax
 " command! SpellCheckEng :setlocal spell spelllang=en
 " command! SpellCheckFra :setlocal spell spelllang=fr
 
-" ----------------------------- FUZZY FILE SEARCH -----------------------------
+" -------------------------------- FILE SEARCH --------------------------------
 
-set path+=**
 set wildmenu
 set wildignorecase
 " ignore these files when completing names and in Ex
@@ -268,8 +267,8 @@ let g:netrw_liststyle=3             " tree view
 nmap <leader>O O<Esc>j
 nmap <leader>o o<Esc>k
 
-nnoremap j gj
-nnoremap k gk
+noremap j gj
+noremap k gk
 
 " Clear search && close preview window
 nnoremap <silent> <leader><leader> :pclose<CR>:let @/ = ""<CR>
