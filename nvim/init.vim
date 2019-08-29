@@ -100,6 +100,12 @@ Plug 'plasticboy/vim-markdown'
 " GLSL
 Plug 'tikhomirov/vim-glsl'
 
+" ################## FZF #################
+set runtimepath+=/usr/share/vim/vimfiles/
+Plug 'junegunn/fzf.vim'
+nnoremap <leader>f :Files<CR>
+nnoremap <leader>b :Buffers<CR>
+
 " ############## Auto Completion #########
 set shortmess+=c
 set updatetime=300
@@ -130,7 +136,7 @@ let g:ale_fix_on_save             = 1
 nmap <silent> <A-k>           <Plug>(ale_previous_wrap)
 nmap <silent> <A-j>           <Plug>(ale_next_wrap)
 noremap       <leader>aa       :ALEHover<CR>
-noremap       <leader>as       :ALESymbolSearch<CR>
+noremap       <leader>as       :ALESymbolSearch<space>
 noremap       <leader>ad       :ALEDocumentation<CR>
 noremap       <leader>ag       :ALEGoToDefinition<CR>
 noremap       <leader>atg      :ALEGoToDefinitionInTab<CR>
