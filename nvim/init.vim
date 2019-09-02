@@ -99,59 +99,61 @@ Plug 'shumphrey/fugitive-gitlab.vim'
 Plug 'plasticboy/vim-markdown'
 " GLSL
 Plug 'tikhomirov/vim-glsl'
-
-" ################## FZF #################
-set runtimepath+=/usr/share/vim/vimfiles/
-Plug 'junegunn/fzf.vim'
-nnoremap <leader>f :Files<CR>
-nnoremap <leader>b :Buffers<CR>
+" LaTeX
+Plug 'vim-latex/vim-latex'
 
 " ############## Auto Completion #########
+" COC
+Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+let g:coc_global_extensions = [
+            \ 'coc-tag',
+            \ 'coc-syntax',
+            \ 'coc-dictionary',
+            \ 'coc-rls',
+            \ 'coc-json',
+            \ 'coc-snippets',
+            \ 'coc-git',
+            \ 'coc-lists',
+            \ ]
 set shortmess+=c
 set updatetime=300
 
-let g:ale_completion_enabled=1
-Plug 'w0rp/ale'
+augroup COC
+    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+augroup end
 
-set omnifunc=ale#completion#OmniFunc
-set completeopt=menu,menuone,preview,noselect,noinsert
+" {{{
+    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+    inoremap <silent><expr> <c-space> coc#refresh()
 
-let g:ale_linters = {
-    \   'rust': ['rls',],
-    \ }
-let g:ale_fixers = {
-    \   'rust': ['rustfmt'],
-    \}
+    nnoremap <silent> <leader>f :CocList --number-select files<CR>
+    nnoremap <silent> <leader>b :CocList --number-select buffers<CR>
 
-let g:ale_echo_msg_format         = '%severity% [%linter%]% code%: %s'
-" Rust
-let g:ale_rust_rls_toolchain      = ''
-let g:ale_rust_cargo_use_clippy   = 1
-let g:ale_sign_column_always      = 1
-let g:ale_lint_on_insert_leave    = 1
-let g:ale_close_preview_on_insert = 1
-let g:ale_fix_on_save             = 1
+    nnoremap <silent> <leader>d <Plug>(coc-definition)
+    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
+    nnoremap <silent> <leader>i <Plug>(coc-implementation)
+    nnoremap <silent> <leader>r <Plug>(coc-references)
 
-" Remaps
-nmap <silent> <A-k>           <Plug>(ale_previous_wrap)
-nmap <silent> <A-j>           <Plug>(ale_next_wrap)
-noremap       <leader>aa       :ALEHover<CR>
-noremap       <leader>as       :ALESymbolSearch<space>
-noremap       <leader>ad       :ALEDocumentation<CR>
-noremap       <leader>ag       :ALEGoToDefinition<CR>
-noremap       <leader>atg      :ALEGoToDefinitionInTab<CR>
-noremap       <leader>avg      :ALEGoToDefinitionInVSplit<CR>
-noremap       <leader>ar       :ALEFindReferences<CR>
+    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-prev)
+    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-next)
+
+    nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+    " Remap for rename current word
+    nmap <leader>rn <Plug>(coc-rename)
+
+    " Remap for format selected region
+    vmap <leader>gf <Plug>(coc-format-selected)
+    nmap <leader>gf <Plug>(coc-format-selected)
+" }}}
+set shortmess+=c
+set updatetime=300
 
 " Snippets
 Plug 'SirVer/ultisnips'
-let g:UltiSnipsExpandTrigger       = '<tab>'
-let g:UltiSnipsJumpForwardTrigger  = '<c-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 Plug 'honza/vim-snippets'
 Plug 'niverton/niv-snippets'
-
-"Plug 'aurieh/discord.nvim', { 'do': ':UpdateRemotePlugins'}
 
 call plug#end()
 
@@ -210,7 +212,7 @@ augroup WHITESPACE
     autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
     autocmd InsertLeave * match ExtraWhitespace /\s\+$/
     autocmd BufWinLeave * call clearmatches()
-augroup end
+augroup END
 
 function! TrimWhiteSpace()
     %s/\s\+$//e
@@ -239,11 +241,10 @@ set foldmethod=syntax
 
 " -------------------------------- SPELL CHECK --------------------------------
 
-" TODO fix this, investigate
 " highlight clear SpellBad
 " highlight SpellBad cterm=underline
-" command! SpellCheckEng :setlocal spell spelllang=en
-" command! SpellCheckFra :setlocal spell spelllang=fr
+command! SpellCheckEng :setlocal spell spelllang=en
+command! SpellCheckFra :setlocal spell spelllang=fr
 
 " -------------------------------- FILE SEARCH --------------------------------
 
