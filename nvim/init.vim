@@ -99,8 +99,6 @@ Plug 'shumphrey/fugitive-gitlab.vim'
 Plug 'plasticboy/vim-markdown'
 " GLSL
 Plug 'tikhomirov/vim-glsl'
-" LaTeX
-Plug 'vim-latex/vim-latex'
 
 " ############## Auto Completion #########
 " COC
