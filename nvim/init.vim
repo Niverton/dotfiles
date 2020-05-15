@@ -83,6 +83,9 @@ Plug 'tpope/vim-unimpaired'
 " Comments
 Plug 'tpope/vim-commentary'
 
+" Abolish
+Plug 'tpope/vim-abolish'
+
 " Align characters
 Plug 'tommcdo/vim-lion'
 
@@ -101,59 +104,97 @@ Plug 'plasticboy/vim-markdown'
 Plug 'tikhomirov/vim-glsl'
 
 " ############## Auto Completion #########
-" COC
-Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-let g:coc_global_extensions = [
-            \ 'coc-tag',
-            \ 'coc-syntax',
-            \ 'coc-dictionary',
-            \ 'coc-rls',
-            \ 'coc-json',
-            \ 'coc-snippets',
-            \ 'coc-git',
-            \ 'coc-lists',
-            \ ]
-set shortmess+=c
-set updatetime=300
+"" COC
+"{{{
+"Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+"let g:coc_global_extensions = [
+"            \ 'coc-tag',
+"            \ 'coc-syntax',
+"            \ 'coc-dictionary',
+"            \ 'coc-rls',
+"            \ 'coc-json',
+"            \ 'coc-snippets',
+"            \ 'coc-git',
+"            \ 'coc-lists',
+"            \ ]
+"set shortmess+=c
+"set updatetime=300
+"
+"augroup COC
+"    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+"augroup end
+"
+"" {{{
+"    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+"    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+"    inoremap <silent><expr> <c-space> coc#refresh()
+"
+"    nnoremap <silent> <leader>f :CocList --number-select files<CR>
+"    nnoremap <silent> <leader>b :CocList --number-select buffers<CR>
+"
+"    nnoremap <silent> <leader>d <Plug>(coc-definition)
+"    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
+"    nnoremap <silent> <leader>i <Plug>(coc-implementation)
+"    nnoremap <silent> <leader>r <Plug>(coc-references)
+"
+"    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-prev)
+"    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-next)
+"
+"    nnoremap <silent> K :call <SID>show_documentation()<CR>
+"
+"    " Remap for rename current word
+"    nmap <leader>rn <Plug>(coc-rename)
+"
+"    " Remap for format selected region
+"    vmap <leader>gf <Plug>(coc-format-selected)
+"    nmap <leader>gf <Plug>(coc-format-selected)
+"" }}}
+"}}}
 
-augroup COC
-    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-augroup end
-
-" {{{
-    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-    inoremap <silent><expr> <c-space> coc#refresh()
-
-    nnoremap <silent> <leader>f :CocList --number-select files<CR>
-    nnoremap <silent> <leader>b :CocList --number-select buffers<CR>
-
-    nnoremap <silent> <leader>d <Plug>(coc-definition)
-    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
-    nnoremap <silent> <leader>i <Plug>(coc-implementation)
-    nnoremap <silent> <leader>r <Plug>(coc-references)
-
-    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-prev)
-    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-next)
-
-    nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-    " Remap for rename current word
-    nmap <leader>rn <Plug>(coc-rename)
-
-    " Remap for format selected region
-    vmap <leader>gf <Plug>(coc-format-selected)
-    nmap <leader>gf <Plug>(coc-format-selected)
-" }}}
-set shortmess+=c
-set updatetime=300
+" Nvim LSP
+if has('nvim-0.5.0')
+    Plug 'neovim/nvim-lsp'
+endif
 
 " Snippets
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-Plug 'niverton/niv-snippets'
+"Plug 'SirVer/ultisnips'
+"Plug 'honza/vim-snippets'
+"Plug 'niverton/niv-snippets'
+
+" ################ Fuzzy ################
+if executable('sk')
+    Plug 'lotabout/skim.vim'
+
+    nnoremap <silent> <leader>b :Buffers<CR>
+    nnoremap <silent> <leader>f :Files<CR>
+
+    command! -bang -nargs=* Ag call fzf#vim#ag_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+    command! -bang -nargs=* Rg call fzf#vim#rg_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+endif
 
 call plug#end()
+
+" -------------------------------- LSP confing --------------------------------
+
+if has('nvim-0.5.0')
+    " Mappings
+    nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
+    nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
+    nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+    nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+    nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+    nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+    nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+
+    " Languages
+    " Rust
+    autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
+
+lua << EOF
+local nvim_lsp = require('nvim_lsp')
+nvim_lsp.rust_analyzer.setup({})
+EOF
+endif
 
 " -------------------------------- COLORSCHEME --------------------------------
 
