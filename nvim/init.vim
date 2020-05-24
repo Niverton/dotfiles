@@ -104,62 +104,11 @@ Plug 'plasticboy/vim-markdown'
 Plug 'tikhomirov/vim-glsl'
 
 " ############## Auto Completion #########
-"" COC
-"{{{
-"Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-"let g:coc_global_extensions = [
-"            \ 'coc-tag',
-"            \ 'coc-syntax',
-"            \ 'coc-dictionary',
-"            \ 'coc-rls',
-"            \ 'coc-json',
-"            \ 'coc-snippets',
-"            \ 'coc-git',
-"            \ 'coc-lists',
-"            \ ]
-"set shortmess+=c
-"set updatetime=300
-"
-"augroup COC
-"    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-"augroup end
-"
-"" {{{
-"    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-"    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-"    inoremap <silent><expr> <c-space> coc#refresh()
-"
-"    nnoremap <silent> <leader>f :CocList --number-select files<CR>
-"    nnoremap <silent> <leader>b :CocList --number-select buffers<CR>
-"
-"    nnoremap <silent> <leader>d <Plug>(coc-definition)
-"    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
-"    nnoremap <silent> <leader>i <Plug>(coc-implementation)
-"    nnoremap <silent> <leader>r <Plug>(coc-references)
-"
-"    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-prev)
-"    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-next)
-"
-"    nnoremap <silent> K :call <SID>show_documentation()<CR>
-"
-"    " Remap for rename current word
-"    nmap <leader>rn <Plug>(coc-rename)
-"
-"    " Remap for format selected region
-"    vmap <leader>gf <Plug>(coc-format-selected)
-"    nmap <leader>gf <Plug>(coc-format-selected)
-"" }}}
-"}}}
 
 " Nvim LSP
 if has('nvim-0.5.0')
     Plug 'neovim/nvim-lsp'
 endif
-
-" Snippets
-"Plug 'SirVer/ultisnips'
-"Plug 'honza/vim-snippets'
-"Plug 'niverton/niv-snippets'
 
 " ################ Fuzzy ################
 if executable('sk')
@@ -185,6 +134,7 @@ if has('nvim-0.5.0')
     nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
     nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
     nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+    nnoremap <silent> <leader>d <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
 
     " Languages
     " Rust
@@ -227,6 +177,8 @@ set splitright
 
 set hidden
 set cmdheight=2
+
+set shell=/bin/bash
 
 " Terminal mode settings
 augroup TERM
@@ -291,8 +243,8 @@ set wildmenu
 set wildignorecase
 " ignore these files when completing names and in Ex
 set wildignore=build,release,debug,.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam
-" set of file name suffixes that will be given a lower priority when
-" it comes to matching wildcards
+" set of file name suffixes that will be given a lower priority when it comes to
+" matching wildcards
 set suffixes+=.old*
 
 " -------------------------------- NETRW CONFIG -------------------------------
