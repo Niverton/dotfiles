@@ -65,6 +65,8 @@ let g:lightline={
         \       'mode'           : 'LightlineMode',
         \ },
         \ }
+" Display code context at the top
+Plug 'wellle/context.vim'
 
 " VimWiki
 Plug 'vimwiki/vimwiki'
@@ -135,6 +137,7 @@ if has('nvim-0.5.0')
     nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
     nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
     nnoremap <silent> <leader>d <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
+    nnoremap <silent> <leader>g <cmd>lua vim.lsp.buf.formatting()<CR>
 
     " Languages
     " Rust
@@ -177,8 +180,6 @@ set splitright
 
 set hidden
 set cmdheight=2
-
-set shell=/bin/bash
 
 " Terminal mode settings
 augroup TERM
