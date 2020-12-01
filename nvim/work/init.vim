@@ -9,7 +9,10 @@ let g:mapleader="\<Space>"
 if empty(glob('C:\Users\rmaugez\AppData\Local\nvim\autoload\plug.vim'))
     silent !curl -fLo C:\Users\rmaugez\AppData\Local\nvim\autoload\plug.vim --create-dirs
             \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup VimPlug
+        autocmd!
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup END
 endif
 
 call plug#begin('~/AppData/Local/nvim/plugged')
@@ -26,8 +29,7 @@ let s:active_theme='gruvbox'
 
 if s:active_theme ==? 'gruvbox'
     " Gruvbox
-    "Plug 'morhetz/gruvbox'
-	Plug 'gruvbox-community/gruvbox'
+    Plug 'gruvbox-community/gruvbox'
     let g:gruvbox_contrast_dark ='medium'
     let g:gruvbox_contrast_light='hard'
     let g:gruvbox_inverse='1'
@@ -50,7 +52,7 @@ let g:lightline={
         \               [ 'spell', 'gitbranch', 'readonly', 'filename' ] ],
         \       'right': [ ['linenum'],
         \               ['filetype'],
-        \               ['cocstatus', 'currentfunction', 'fileencoding'] ],
+        \               ['fileencoding'] ],
         \ },
         \ 'component': {
         \       'linenum': '%l/%L:%c',
@@ -60,10 +62,10 @@ let g:lightline={
         \       'gitbranch'      : 'fugitive#head',
         \       'filename'       : 'LightlineFilename',
         \       'mode'           : 'LightlineMode',
-        \       'cocstatus'      : 'coc#status',
-        \       'currentfunction': 'CocCurrentFunction'
         \ },
         \ }
+" Display code context at the top
+Plug 'wellle/context.vim'
 
 " VimWiki
 Plug 'vimwiki/vimwiki'
@@ -81,6 +83,9 @@ Plug 'tpope/vim-unimpaired'
 
 " Comments
 Plug 'tpope/vim-commentary'
+
+" Abolish
+Plug 'tpope/vim-abolish'
 
 " Align characters
 Plug 'tommcdo/vim-lion'
@@ -106,59 +111,82 @@ Plug 'beyondmarc/hlsl.vim'
 autocmd BufNewFile,BufRead *.chl,*.phl,*.vhl,*.ghl set filetype=hlsl
 
 " ############## Auto Completion #########
-" COC
-Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
-let g:coc_global_extensions = [
-            \ 'coc-tag',
-            \ 'coc-syntax',
-            \ 'coc-snippets',
-            \ 'coc-lists',
-            \ 'coc-git',
-            \ 'coc-emoji',
-            \ 'coc-dictionary',
-            \ 'coc-rls',
-            \ 'coc-json',
-            \ ]
-set shortmess+=c
-set updatetime=300
 
-augroup COC
-    autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-augroup end
+" Nvim LSP
+if has('nvim-0.5.0')
+    Plug 'neovim/nvim-lsp'
+    Plug 'RishabhRD/popfix'
+    Plug 'RishabhRD/nvim-lsputils'
+    Plug 'nvim-lua/diagnostic-nvim'
+endif
 
-" {{{
-    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-    inoremap <silent><expr> <c-space> coc#refresh()
-
-    nnoremap <silent> <leader>f :CocList files<CR>
-    nnoremap <silent> <leader>b :CocList buffers<CR>
-
-    nnoremap <silent> <leader>d <Plug>(coc-definition)
-    nnoremap <silent> <leader>y <Plug>(coc-type-definition)
-    nnoremap <silent> <leader>i <Plug>(coc-implementation)
-    nnoremap <silent> <leader>r <Plug>(coc-references)
-
-    nnoremap <silent> <leader>n <Plug>(coc-diagnostic-next)
-    nnoremap <silent> <leader>p <Plug>(coc-diagnostic-prev)
-
-    nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-    " Remap for rename current word
-    nmap <leader>rn <Plug>(coc-rename)
-
-    " Remap for format selected region
-    vmap <leader>gf  <Plug>(coc-format-selected)
-    nmap <leader>gf  <Plug>(coc-format-selected)
-" }}}
-
-" Snippets
-Plug 'honza/vim-snippets'
-Plug 'niverton/niv-snippets'
-
-"Plug 'aurieh/discord.nvim', { 'do': ':UpdateRemotePlugins'}
+" ################ Fuzzy ################
+let s:use_skim=0
+if and(s:use_skim, executable('sk'))
+    Plug 'lotabout/skim.vim'
+elseif executable('fzf')
+    Plug 'junegunn/fzf'
+    let s:use_fzf=1
+endif
 
 call plug#end()
+
+" -------------------------------- LSP confing --------------------------------
+
+if has('nvim-0.5.0')
+    " Mappings
+    nnoremap <silent> <leader>d     <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
+    nnoremap <silent> <leader>a     <cmd>lua vim.lsp.buf.code_action()<CR>
+    nnoremap <silent> <leader>gD    <cmd>lua vim.lsp.buf.declaration()<CR>
+    nnoremap <silent> <leader>gd    <cmd>lua vim.lsp.buf.definition()<CR>
+    nnoremap <silent> <leader>=     <cmd>lua vim.lsp.buf.formatting()<CR>
+    nnoremap <silent> K             <cmd>lua vim.lsp.buf.hover()<CR>
+    inoremap <silent> <c-k>         <cmd>lua vim.lsp.buf.signature_help()<CR>
+    nnoremap <silent> <c-k>         <cmd>lua vim.lsp.buf.signature_help()<CR>
+    nnoremap <silent> <leader>gi    <cmd>lua vim.lsp.buf.implementation()<CR>
+    nnoremap <silent> <leader>lci   <cmd>lua vim.lsp.buf.incoming_calls()<CR>
+    nnoremap <silent> <leader>lco   <cmd>lua vim.lsp.buf.outgoing_calls()<CR>
+    nnoremap <silent> <leader>lr    <cmd>lua vim.lsp.buf.references()<CR>
+    nnoremap <silent> <leader>r     <cmd>lua vim.lsp.buf.rename()<CR>
+    nnoremap <silent> <leader>tD    <cmd>lua vim.lsp.buf.type_definition()<CR>
+    nnoremap <silent> <leader>tw    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+    nnoremap <silent> <leader>td    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+
+"augroup LSPHIGHLIGHT " Highlight references to element under cursor
+"    autocmd!
+"    autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+"    autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
+"    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+"augroup END
+
+    " Languages
+augroup LSPLANGUAGES
+    autocmd!
+    " Rust
+    autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
+augroup END
+
+lua << EOF
+local lspconfig = require('lspconfig')
+lspconfig.rust_analyzer.setup{on_attach=require'diagnostic'.on_attach}
+
+vim.lsp.callbacks['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
+vim.lsp.callbacks['textDocument/references'] = require'lsputil.locations'.references_handler
+vim.lsp.callbacks['textDocument/definition'] = require'lsputil.locations'.definition_handler
+vim.lsp.callbacks['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
+vim.lsp.callbacks['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
+vim.lsp.callbacks['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
+vim.lsp.callbacks['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
+vim.lsp.callbacks['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
+EOF
+
+call sign_define("LspDiagnosticsErrorSign", {"text" : "E", "texthl" : "LspDiagnosticsError"})
+call sign_define("LspDiagnosticsWarningSign", {"text" : "W", "texthl" : "LspDiagnosticsWarning"})
+call sign_define("LspDiagnosticsInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
+call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
+endif
+
+set completeopt=menuone,preview,noinsert,noselect
 
 " -------------------------------- COLORSCHEME --------------------------------
 
@@ -191,6 +219,7 @@ set noequalalways             " Don't resize all windows when layout changes
 set diffopt+=vertical
 set splitbelow
 set splitright
+set updatetime=800
 
 set hidden
 set cmdheight=2
@@ -202,6 +231,7 @@ set listchars=tab:>\ ,extends:>,precedes:<,space:·
 
 " Terminal mode settings
 augroup TERM
+    autocmd!
     function! TermEnter()
         if &buftype ==# 'terminal'
             startinsert
@@ -210,8 +240,8 @@ augroup TERM
 
     autocmd TermOpen * setlocal nonumber
     autocmd TermOpen * setlocal nocursorline
-    autocmd TermOpen * startinsert
-    autocmd BufEnter * call TermEnter()
+    "autocmd TermOpen * startinsert
+    "autocmd BufEnter * call TermEnter()
 augroup end
 
 " hightlight whitespaces
@@ -219,11 +249,12 @@ augroup end
 highlight! link ExtraWhitespace Error
 match ExtraWhitespace /\s\+$/
 augroup WHITESPACE
+    autocmd!
     autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
     autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
     autocmd InsertLeave * match ExtraWhitespace /\s\+$/
     autocmd BufWinLeave * call clearmatches()
-augroup end
+augroup END
 
 function! TrimWhiteSpace()
     %s/\s\+$//e
@@ -240,8 +271,22 @@ set hlsearch
 
 " Ripgrep
 if executable('rg')
-    set grepprg=rg\ --vimgrep
+    set grepprg=rg\ --vimgrep\ --ignore-case
 endif
+
+" FZF/Skim
+if s:use_skim
+    nnoremap <silent> <leader>b :Buffers<CR>
+    nnoremap <silent> <leader>f :Files<CR>
+
+    command! -bang -nargs=* Ag call fzf#vim#ag_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+    command! -bang -nargs=* Rg call fzf#vim#rg_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+elseif s:use_fzf
+    nnoremap <silent> <leader>f :FZF<CR>
+    command! FZFBuffers call fzf#run(fzf#wrap({'source': map(getbufinfo({'buflisted':1}), 'v:val.name'), 'sink': 'b'}))<CR>
+    "nnoremap <silent> <leader>b :FZFBuffers<CR>
+endif
+
 
 " ---------------------------------- FOLDING ----------------------------------
 
@@ -252,21 +297,20 @@ set foldmethod=syntax
 
 " -------------------------------- SPELL CHECK --------------------------------
 
-" TODO fix this, investigate
 " highlight clear SpellBad
 " highlight SpellBad cterm=underline
-" command! SpellCheckEng :setlocal spell spelllang=en
-" command! SpellCheckFra :setlocal spell spelllang=fr
+command! SpellCheckEng :setlocal spell spelllang=en
+command! SpellCheckFra :setlocal spell spelllang=fr
 
-" ----------------------------- FUZZY FILE SEARCH -----------------------------
+" -------------------------------- FILE SEARCH --------------------------------
 
 set path+=**
 set wildmenu
 set wildignorecase
 " ignore these files when completing names and in Ex
 set wildignore=build,release,debug,.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*.pdf,*.bak,*.beam
-" set of file name suffixes that will be given a lower priority when
-" it comes to matching wildcards
+" set of file name suffixes that will be given a lower priority when it comes to
+" matching wildcards
 set suffixes+=.old*
 
 " -------------------------------- NETRW CONFIG -------------------------------
@@ -281,11 +325,14 @@ let g:netrw_liststyle=3             " tree view
 nmap <leader>O O<Esc>j
 nmap <leader>o o<Esc>k
 
-nnoremap j gj
-nnoremap k gk
+noremap j gj
+noremap k gk
 
 " Clear search && close preview window
-nnoremap <silent> <leader><leader> :pclose<CR>:let @/ = ""<CR>
+nnoremap <silent> <leader><leader> :pclose<CR>:cclose<CR>:let @/ = ""<CR>
+
+" List buffers and prompt
+nnoremap <leader>b :ls<CR>:b 
 
 " Normal mode from terminal mode
 tnoremap <Esc> <C-\><C-n>
@@ -323,6 +370,3 @@ function! LightlineSpell()
     endif
 endfunction
 
-function! CocCurrentFunction()
-    return get(b:, 'coc_current_function', '')
-endfunction

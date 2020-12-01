@@ -10,6 +10,7 @@ if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
     silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
             \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     augroup VimPlug
+        autocmd!
         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
     augroup END
 endif
@@ -110,17 +111,18 @@ Plug 'tikhomirov/vim-glsl'
 " Nvim LSP
 if has('nvim-0.5.0')
     Plug 'neovim/nvim-lsp'
+    Plug 'RishabhRD/popfix'
+    Plug 'RishabhRD/nvim-lsputils'
+    Plug 'nvim-lua/diagnostic-nvim'
 endif
 
 " ################ Fuzzy ################
-if executable('sk')
+let s:use_skim=0
+if and(s:use_skim, executable('sk'))
     Plug 'lotabout/skim.vim'
-
-    nnoremap <silent> <leader>b :Buffers<CR>
-    nnoremap <silent> <leader>f :Files<CR>
-
-    command! -bang -nargs=* Ag call fzf#vim#ag_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
-    command! -bang -nargs=* Rg call fzf#vim#rg_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+elseif executable('fzf')
+    Plug 'junegunn/fzf'
+    let s:use_fzf=1
 endif
 
 call plug#end()
@@ -129,25 +131,58 @@ call plug#end()
 
 if has('nvim-0.5.0')
     " Mappings
-    nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
-    nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
-    nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
-    nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
-    nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-    nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
-    nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
-    nnoremap <silent> <leader>d <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
-    nnoremap <silent> <leader>g <cmd>lua vim.lsp.buf.formatting()<CR>
+    nnoremap <silent> <leader>d     <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
+    nnoremap <silent> <leader>a     <cmd>lua vim.lsp.buf.code_action()<CR>
+    nnoremap <silent> <leader>gD    <cmd>lua vim.lsp.buf.declaration()<CR>
+    nnoremap <silent> <leader>gd    <cmd>lua vim.lsp.buf.definition()<CR>
+    nnoremap <silent> <leader>=     <cmd>lua vim.lsp.buf.formatting()<CR>
+    nnoremap <silent> K             <cmd>lua vim.lsp.buf.hover()<CR>
+    inoremap <silent> <c-k>         <cmd>lua vim.lsp.buf.signature_help()<CR>
+    nnoremap <silent> <c-k>         <cmd>lua vim.lsp.buf.signature_help()<CR>
+    nnoremap <silent> <leader>gi    <cmd>lua vim.lsp.buf.implementation()<CR>
+    nnoremap <silent> <leader>lci   <cmd>lua vim.lsp.buf.incoming_calls()<CR>
+    nnoremap <silent> <leader>lco   <cmd>lua vim.lsp.buf.outgoing_calls()<CR>
+    nnoremap <silent> <leader>lr    <cmd>lua vim.lsp.buf.references()<CR>
+    nnoremap <silent> <leader>r     <cmd>lua vim.lsp.buf.rename()<CR>
+    nnoremap <silent> <leader>tD    <cmd>lua vim.lsp.buf.type_definition()<CR>
+    nnoremap <silent> <leader>tw    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+    nnoremap <silent> <leader>td    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+
+"augroup LSPHIGHLIGHT " Highlight references to element under cursor
+"    autocmd!
+"    autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+"    autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
+"    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+"augroup END
 
     " Languages
+augroup LSPLANGUAGES
+    autocmd!
     " Rust
     autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
+augroup END
 
 lua << EOF
-local nvim_lsp = require('nvim_lsp')
-nvim_lsp.rust_analyzer.setup({})
+local lspconfig = require('lspconfig')
+lspconfig.rust_analyzer.setup{on_attach=require'diagnostic'.on_attach}
+
+vim.lsp.callbacks['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
+vim.lsp.callbacks['textDocument/references'] = require'lsputil.locations'.references_handler
+vim.lsp.callbacks['textDocument/definition'] = require'lsputil.locations'.definition_handler
+vim.lsp.callbacks['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
+vim.lsp.callbacks['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
+vim.lsp.callbacks['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
+vim.lsp.callbacks['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
+vim.lsp.callbacks['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
 EOF
+
+call sign_define("LspDiagnosticsErrorSign", {"text" : "E", "texthl" : "LspDiagnosticsError"})
+call sign_define("LspDiagnosticsWarningSign", {"text" : "W", "texthl" : "LspDiagnosticsWarning"})
+call sign_define("LspDiagnosticsInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
+call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
 endif
+
+set completeopt=menuone,preview,noinsert,noselect
 
 " -------------------------------- COLORSCHEME --------------------------------
 
@@ -162,7 +197,7 @@ execute 'colorscheme ' . s:active_theme
 " Disable default rustmode 'style preference' (tw=99, sw=4)
 let g:rust_recommended_style=0
 
-set tabstop=8                 " Tab size
+set tabstop=4                 " Tab size
 set shiftwidth=4              " Indent size
 set expandtab                 " Use spaces instead of tabs
 set number                    " Display line numbers
@@ -177,12 +212,14 @@ set noequalalways             " Don't resize all windows when layout changes
 set diffopt+=vertical
 set splitbelow
 set splitright
+set updatetime=800
 
 set hidden
 set cmdheight=2
 
 " Terminal mode settings
 augroup TERM
+    autocmd!
     function! TermEnter()
         if &buftype ==# 'terminal'
             startinsert
@@ -191,8 +228,8 @@ augroup TERM
 
     autocmd TermOpen * setlocal nonumber
     autocmd TermOpen * setlocal nocursorline
-    autocmd TermOpen * startinsert
-    autocmd BufEnter * call TermEnter()
+    "autocmd TermOpen * startinsert
+    "autocmd BufEnter * call TermEnter()
 augroup end
 
 " hightlight whitespaces
@@ -200,6 +237,7 @@ augroup end
 highlight! link ExtraWhitespace Error
 match ExtraWhitespace /\s\+$/
 augroup WHITESPACE
+    autocmd!
     autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
     autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
     autocmd InsertLeave * match ExtraWhitespace /\s\+$/
@@ -221,8 +259,22 @@ set hlsearch
 
 " Ripgrep
 if executable('rg')
-    set grepprg=rg\ --vimgrep
+    set grepprg=rg\ --vimgrep\ --ignore-case
 endif
+
+" FZF/Skim
+if s:use_skim
+    nnoremap <silent> <leader>b :Buffers<CR>
+    nnoremap <silent> <leader>f :Files<CR>
+
+    command! -bang -nargs=* Ag call fzf#vim#ag_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+    command! -bang -nargs=* Rg call fzf#vim#rg_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
+elseif s:use_fzf
+    nnoremap <silent> <leader>f :FZF<CR>
+    command! FZFBuffers call fzf#run(fzf#wrap({'source': map(getbufinfo({'buflisted':1}), 'v:val.name'), 'sink': 'b'}))<CR>
+    "nnoremap <silent> <leader>b :FZFBuffers<CR>
+endif
+
 
 " ---------------------------------- FOLDING ----------------------------------
 
@@ -240,6 +292,7 @@ command! SpellCheckFra :setlocal spell spelllang=fr
 
 " -------------------------------- FILE SEARCH --------------------------------
 
+set path+=**
 set wildmenu
 set wildignorecase
 " ignore these files when completing names and in Ex
@@ -264,7 +317,10 @@ noremap j gj
 noremap k gk
 
 " Clear search && close preview window
-nnoremap <silent> <leader><leader> :pclose<CR>:let @/ = ""<CR>
+nnoremap <silent> <leader><leader> :pclose<CR>:cclose<CR>:let @/ = ""<CR>
+
+" List buffers and prompt
+nnoremap <leader>b :ls<CR>:b 
 
 " Normal mode from terminal mode
 tnoremap <Esc> <C-\><C-n>
