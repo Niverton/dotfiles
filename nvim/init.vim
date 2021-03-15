@@ -31,18 +31,18 @@ let s:active_theme='gruvbox'
 
 if s:active_theme ==? 'gruvbox'
     " Gruvbox
-    Plug 'gruvbox-community/gruvbox'
-    let g:gruvbox_contrast_dark ='medium'
+    let g:gruvbox_contrast_dark='medium'
     let g:gruvbox_contrast_light='hard'
     let g:gruvbox_inverse='1'
     let g:gruvbox_italic='1'
+    Plug 'gruvbox-community/gruvbox'
 elseif s:active_theme ==? 'nord'
     " Nord
-    Plug 'arcticicestudio/nord-vim'
     let g:nord_italic=1
     let g:nord_underline=1
     let g:nord_cursor_line_number_background=1
     let g:nord_comment_brightness=10
+    Plug 'arcticicestudio/nord-vim'
 end
 
 " LightLine
@@ -66,6 +66,27 @@ let g:lightline={
         \       'mode'           : 'LightlineMode',
         \ },
         \ }
+augroup LightlineColorscheme
+    autocmd!
+    autocmd ColorScheme * call s:lightline_update()
+augroup END
+function! s:lightline_update()
+    if !exists('g:loaded_lightline')
+        return
+    endif
+    if g:colors_name ==# 'gruvbox'
+        " Reload gruvbox lightline plugin to set colors with new background
+        " Use execute to only call 'runtime' when the function is called, not
+        " when it is read...
+        execute 'runtime' "/autoload/lightline/colorscheme/gruvbox.vim"
+    elseif g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|seoul256\|Tomorrow'
+        let g:lightline.colorscheme =
+                    \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '')
+    endif
+    call lightline#init()
+    call lightline#colorscheme()
+    call lightline#update()
+endfunction
 " Display code context at the top
 Plug 'wellle/context.vim'
 
