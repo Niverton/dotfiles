@@ -29,18 +29,18 @@ let s:active_theme='gruvbox'
 
 if s:active_theme ==? 'gruvbox'
     " Gruvbox
-    Plug 'gruvbox-community/gruvbox'
-    let g:gruvbox_contrast_dark ='medium'
+    let g:gruvbox_contrast_dark='medium'
     let g:gruvbox_contrast_light='hard'
     let g:gruvbox_inverse='1'
     let g:gruvbox_italic='1'
+    Plug 'gruvbox-community/gruvbox'
 elseif s:active_theme ==? 'nord'
     " Nord
-    Plug 'arcticicestudio/nord-vim'
     let g:nord_italic=1
     let g:nord_underline=1
     let g:nord_cursor_line_number_background=1
     let g:nord_comment_brightness=10
+    Plug 'arcticicestudio/nord-vim'
 end
 
 " LightLine
@@ -64,6 +64,27 @@ let g:lightline={
         \       'mode'           : 'LightlineMode',
         \ },
         \ }
+augroup LightlineColorscheme
+    autocmd!
+    autocmd ColorScheme * call s:lightline_update()
+augroup END
+function! s:lightline_update()
+    if !exists('g:loaded_lightline')
+        return
+    endif
+    if g:colors_name ==# 'gruvbox'
+        " Reload gruvbox lightline plugin to set colors with new background
+        " Use execute to only call 'runtime' when the function is called, not
+        " when it is read...
+        execute 'runtime' "/autoload/lightline/colorscheme/gruvbox.vim"
+    elseif g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|seoul256\|Tomorrow'
+        let g:lightline.colorscheme =
+                    \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '')
+    endif
+    call lightline#init()
+    call lightline#colorscheme()
+    call lightline#update()
+endfunction
 " Display code context at the top
 Plug 'wellle/context.vim'
 
@@ -108,7 +129,10 @@ Plug 'plasticboy/vim-markdown'
 Plug 'tikhomirov/vim-glsl'
 " HLSL
 Plug 'beyondmarc/hlsl.vim'
-autocmd BufNewFile,BufRead *.chl,*.phl,*.vhl,*.ghl set filetype=hlsl
+augroup HLSLFT
+    autocmd!
+    autocmd BufNewFile,BufRead *.chl,*.phl,*.vhl,*.ghl set filetype=hlsl
+augroup END
 
 " ############## Auto Completion #########
 
@@ -117,7 +141,6 @@ if has('nvim-0.5.0')
     Plug 'neovim/nvim-lsp'
     Plug 'RishabhRD/popfix'
     Plug 'RishabhRD/nvim-lsputils'
-    Plug 'nvim-lua/diagnostic-nvim'
 endif
 
 " ################ Fuzzy ################
@@ -134,56 +157,79 @@ call plug#end()
 " -------------------------------- LSP confing --------------------------------
 
 if has('nvim-0.5.0')
-    " Mappings
-    nnoremap <silent> <leader>d     <cmd>lua vim.lsp.util.show_line_diagnostics()<CR>
-    nnoremap <silent> <leader>a     <cmd>lua vim.lsp.buf.code_action()<CR>
-    nnoremap <silent> <leader>gD    <cmd>lua vim.lsp.buf.declaration()<CR>
-    nnoremap <silent> <leader>gd    <cmd>lua vim.lsp.buf.definition()<CR>
-    nnoremap <silent> <leader>=     <cmd>lua vim.lsp.buf.formatting()<CR>
-    nnoremap <silent> K             <cmd>lua vim.lsp.buf.hover()<CR>
-    inoremap <silent> <c-k>         <cmd>lua vim.lsp.buf.signature_help()<CR>
-    nnoremap <silent> <c-k>         <cmd>lua vim.lsp.buf.signature_help()<CR>
-    nnoremap <silent> <leader>gi    <cmd>lua vim.lsp.buf.implementation()<CR>
-    nnoremap <silent> <leader>lci   <cmd>lua vim.lsp.buf.incoming_calls()<CR>
-    nnoremap <silent> <leader>lco   <cmd>lua vim.lsp.buf.outgoing_calls()<CR>
-    nnoremap <silent> <leader>lr    <cmd>lua vim.lsp.buf.references()<CR>
-    nnoremap <silent> <leader>r     <cmd>lua vim.lsp.buf.rename()<CR>
-    nnoremap <silent> <leader>tD    <cmd>lua vim.lsp.buf.type_definition()<CR>
-    nnoremap <silent> <leader>tw    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-    nnoremap <silent> <leader>td    <cmd>lua vim.lsp.buf.document_symbol()<CR>
-
-"augroup LSPHIGHLIGHT " Highlight references to element under cursor
-"    autocmd!
-"    autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
-"    autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
-"    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-"augroup END
-
-    " Languages
-augroup LSPLANGUAGES
-    autocmd!
-    " Rust
-    autocmd Filetype rust setlocal omnifunc=v:lua.vim.lsp.omnifunc
-augroup END
-
-lua << EOF
-local lspconfig = require('lspconfig')
-lspconfig.rust_analyzer.setup{on_attach=require'diagnostic'.on_attach}
-
-vim.lsp.callbacks['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
-vim.lsp.callbacks['textDocument/references'] = require'lsputil.locations'.references_handler
-vim.lsp.callbacks['textDocument/definition'] = require'lsputil.locations'.definition_handler
-vim.lsp.callbacks['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
-vim.lsp.callbacks['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
-vim.lsp.callbacks['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
-vim.lsp.callbacks['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
-vim.lsp.callbacks['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
-EOF
-
 call sign_define("LspDiagnosticsErrorSign", {"text" : "E", "texthl" : "LspDiagnosticsError"})
 call sign_define("LspDiagnosticsWarningSign", {"text" : "W", "texthl" : "LspDiagnosticsWarning"})
 call sign_define("LspDiagnosticsInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
 call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
+
+lua << EOF
+local nvim_lsp = require('lspconfig')
+local on_attach = function(client, bufnr)
+    local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+    local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+    buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+    -- Mappings.
+    local opts = { noremap=true, silent=true }
+    buf_set_keymap('n', '<leader>d', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>',               opts)
+    buf_set_keymap('n', '<leader>a', '<Cmd>lua vim.lsp.buf.code_action()<CR>',                                opts)
+    buf_set_keymap('n', '<leader>gD','<Cmd>lua vim.lsp.buf.declaration()<CR>',                                opts)
+    buf_set_keymap('n', '<leader>gd','<Cmd>lua vim.lsp.buf.definition()<CR>',                                 opts)
+    buf_set_keymap('n', 'K',         '<Cmd>lua vim.lsp.buf.hover()<CR>',                                      opts)
+    buf_set_keymap('n', '<C-k>',     '<cmd>lua vim.lsp.buf.signature_help()<CR>',                             opts)
+    buf_set_keymap('n', '<leader>gi','<cmd>lua vim.lsp.buf.implementation()<CR>',                             opts)
+    buf_set_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>',                       opts)
+    buf_set_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>',                    opts)
+    buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+    buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>',                                     opts)
+    buf_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.references()<CR>',                                 opts)
+    buf_set_keymap('n', '<leader>D',  '<cmd>lua vim.lsp.buf.type_definition()<CR>',                            opts)
+    buf_set_keymap('n', '[d',        '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>',                           opts)
+    buf_set_keymap('n', ']d',        '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>',                           opts)
+    buf_set_keymap('n', '<leader>q',  '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>',                         opts)
+
+    -- Set some keybinds conditional on server capabilities
+    if client.resolved_capabilities.document_formatting then
+        buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+    elseif client.resolved_capabilities.document_range_formatting then
+        buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+    end
+
+    -- Set autocommands conditional on server_capabilities
+    if client.resolved_capabilities.document_highlight then
+        vim.api.nvim_exec([[
+            hi LspReferenceRead  cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
+            hi LspReferenceText  cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
+            hi LspReferenceWrite cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
+            augroup lsp_document_highlight
+                autocmd! * <buffer>
+                autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+                autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+            augroup END
+        ]], false)
+    end
+
+    -- Replace default hooks
+    vim.lsp.handlers['textDocument/codeAction'] = require'lsputil.codeAction'.code_action_handler
+    vim.lsp.handlers['textDocument/references'] = require'lsputil.locations'.references_handler
+    vim.lsp.handlers['textDocument/definition'] = require'lsputil.locations'.definition_handler
+    vim.lsp.handlers['textDocument/declaration'] = require'lsputil.locations'.declaration_handler
+    vim.lsp.handlers['textDocument/typeDefinition'] = require'lsputil.locations'.typeDefinition_handler
+    vim.lsp.handlers['textDocument/implementation'] = require'lsputil.locations'.implementation_handler
+    vim.lsp.handlers['textDocument/documentSymbol'] = require'lsputil.symbols'.document_handler
+    vim.lsp.handlers['workspace/symbol'] = require'lsputil.symbols'.workspace_handler
+end
+
+-- Use a loop to conveniently both setup defined servers
+-- and map buffer local keybindings when the language server attaches
+local servers = {
+    "rust_analyzer",
+}
+for _, lsp in ipairs(servers) do
+    nvim_lsp[lsp].setup { on_attach = on_attach }
+end
+EOF
 endif
 
 set completeopt=menuone,preview,noinsert,noselect
