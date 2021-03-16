@@ -266,6 +266,7 @@ set diffopt+=vertical
 set splitbelow
 set splitright
 set updatetime=800
+set nobomb " disable BOM
 
 set hidden
 set cmdheight=2
