@@ -137,14 +137,41 @@ if has('nvim-0.5.0')
     Plug 'RishabhRD/nvim-lsputils'
 endif
 
+" ############ Tree-Sitter ##############
+let s:use_tree_sitter=1
+let s:tree_sitter_available=0
+if has('nvim-0.5.0')
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    let s:tree_sitter_available=1
+endif
+let s:use_tree_sitter=and(s:use_tree_sitter, s:tree_sitter_available)
+
 " ################ Fuzzy ################
 let s:use_skim=0
-if and(s:use_skim, executable('sk'))
-    Plug 'lotabout/skim.vim'
-elseif executable('fzf')
-    Plug 'junegunn/fzf'
-    let s:use_fzf=1
+let s:use_fzf=0
+let s:use_telescope=0
+let s:prefer_telescope=1
+let s:prefer_skim=0
+if and(s:prefer_telescope, has('nvim-0.5.0'))
+    Plug 'nvim-lua/popup.nvim'
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+    let s:use_telescope=1
+else
+    if and(s:use_skim, executable('sk'))
+        Plug 'lotabout/skim.vim'
+        let s:use_skim=1
+    elseif executable('fzf')
+        Plug 'junegunn/fzf'
+        let s:use_fzf=1
+    endif
 endif
+
+" ################  DAP  ################
+"if has('nvim-0.5.0')
+"Plug 'mfussenegger/nvim-dap'
+"
+"endif
 
 call plug#end()
 
@@ -159,48 +186,49 @@ call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnos
 lua << EOF
 local nvim_lsp = require('lspconfig')
 local on_attach = function(client, bufnr)
-    local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-    local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+    local function buf_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+    local function buf_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
-    buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+    buf_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     -- Mappings.
     local opts = { noremap=true, silent=true }
-    buf_set_keymap('n', '<leader>d', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>',               opts)
-    buf_set_keymap('n', '<leader>a', '<Cmd>lua vim.lsp.buf.code_action()<CR>',                                opts)
-    buf_set_keymap('n', '<leader>gD','<Cmd>lua vim.lsp.buf.declaration()<CR>',                                opts)
-    buf_set_keymap('n', '<leader>gd','<Cmd>lua vim.lsp.buf.definition()<CR>',                                 opts)
-    buf_set_keymap('n', 'K',         '<Cmd>lua vim.lsp.buf.hover()<CR>',                                      opts)
-    buf_set_keymap('n', '<C-k>',     '<cmd>lua vim.lsp.buf.signature_help()<CR>',                             opts)
-    buf_set_keymap('n', '<leader>gi','<cmd>lua vim.lsp.buf.implementation()<CR>',                             opts)
-    buf_set_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>',                       opts)
-    buf_set_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>',                    opts)
-    buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>',                                     opts)
-    buf_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.references()<CR>',                                 opts)
-    buf_set_keymap('n', '<leader>D',  '<cmd>lua vim.lsp.buf.type_definition()<CR>',                            opts)
-    buf_set_keymap('n', '[d',        '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>',                           opts)
-    buf_set_keymap('n', ']d',        '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>',                           opts)
-    buf_set_keymap('n', '<leader>q',  '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>',                         opts)
+    buf_keymap('n', '<leader>d', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>',               opts)
+    buf_keymap('n', '<leader>a', '<Cmd>lua vim.lsp.buf.code_action()<CR>',                                opts)
+    buf_keymap('n', '<leader>gD','<Cmd>lua vim.lsp.buf.declaration()<CR>',                                opts)
+    buf_keymap('n', '<leader>gd','<Cmd>lua vim.lsp.buf.definition()<CR>',                                 opts)
+    buf_keymap('n', 'K',         '<Cmd>lua vim.lsp.buf.hover()<CR>',                                      opts)
+    buf_keymap('n', '<C-h>',     '<cmd>lua vim.lsp.buf.signature_help()<CR>',                             opts)
+    buf_keymap('i', '<C-h>',     '<cmd>lua vim.lsp.buf.signature_help()<CR>',                             opts)
+    buf_keymap('n', '<leader>gi','<cmd>lua vim.lsp.buf.implementation()<CR>',                             opts)
+    buf_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>',                       opts)
+    buf_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>',                    opts)
+    buf_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+    buf_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>',                                     opts)
+    buf_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.references()<CR>',                                 opts)
+    buf_keymap('n', '<leader>D',  '<cmd>lua vim.lsp.buf.type_definition()<CR>',                            opts)
+    buf_keymap('n', '[d',        '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>',                           opts)
+    buf_keymap('n', ']d',        '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>',                           opts)
+    buf_keymap('n', '<leader>q',  '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>',                         opts)
 
     -- Set some keybinds conditional on server capabilities
     if client.resolved_capabilities.document_formatting then
-        buf_set_keymap("n", "<leader>=", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+        buf_keymap("n", "<leader>=", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
     elseif client.resolved_capabilities.document_range_formatting then
-        buf_set_keymap("n", "<leader>=", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+        buf_keymap("n", "<leader>=", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     end
 
     -- Set autocommands conditional on server_capabilities
     if client.resolved_capabilities.document_highlight then
         vim.api.nvim_exec([[
-            hi LspReferenceRead  cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
-            hi LspReferenceText  cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
-            hi LspReferenceWrite cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
-            augroup lsp_document_highlight
-                autocmd! * <buffer>
-                autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
-                autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-            augroup END
+        hi LspReferenceRead  cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
+        hi LspReferenceText  cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
+        hi LspReferenceWrite cterm=bold ctermbg=fg ctermfg=bg guibg=fg guifg=bg
+        augroup lsp_document_highlight
+            autocmd! * <buffer>
+            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+        augroup END
         ]], false)
     end
 
@@ -218,15 +246,64 @@ end
 -- Use a loop to conveniently both setup defined servers
 -- and map buffer local keybindings when the language server attaches
 local servers = {
-    "rust_analyzer",
+"rust_analyzer",
+"clangd",
 }
 for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup { on_attach = on_attach }
 end
+
+--[[
+nvim_lsp.texlab.setup {
+    name = 'texlab';
+    on_attach = on_attach;
+    settings = {
+        latex = {
+            build = {
+                onSave = true;
+            }
+        }
+    }
+}
+]]--
 EOF
 endif
 
 set completeopt=menuone,preview,noinsert,noselect
+
+" -------------------------------- Tree-Sitter --------------------------------
+
+if s:use_tree_sitter
+lua << EOF
+    -- Indent
+    require'nvim-treesitter.configs'.setup {
+      indent = {
+        enable = true
+      }
+    }
+
+    -- Select
+    require'nvim-treesitter.configs'.setup {
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "gnn",
+          node_incremental = "grn",
+          scope_incremental = "grc",
+          node_decremental = "grm",
+        },
+      },
+    }
+
+    -- Highlight
+    require'nvim-treesitter.configs'.setup {
+      highlight = {
+        enable = true,
+        use_languagetree = true, -- Use this to enable language injection
+      },
+    }
+EOF
+endif
 
 " -------------------------------- COLORSCHEME --------------------------------
 
@@ -308,15 +385,23 @@ endif
 
 " FZF/Skim
 if s:use_skim
-    nnoremap <silent> <leader>b :Buffers<CR>
-    nnoremap <silent> <leader>f :Files<CR>
+    nnoremap <silent> <leader>b <cmd>Buffers<CR>
+    nnoremap <silent> <leader>f <cmd>Files<CR>
 
     command! -bang -nargs=* Ag call fzf#vim#ag_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
     command! -bang -nargs=* Rg call fzf#vim#rg_interactive(<q-args>, fzf#vim#with_preview('right:50%:hidden', 'alt-h'))
 elseif s:use_fzf
-    nnoremap <silent> <leader>f :FZF<CR>
+    nnoremap <silent> <leader>f <cmd>FZF<CR>
     command! FZFBuffers call fzf#run(fzf#wrap({'source': map(getbufinfo({'buflisted':1}), 'v:val.name'), 'sink': 'b'}))<CR>
-    "nnoremap <silent> <leader>b :FZFBuffers<CR>
+    "nnoremap <silent> <leader>b <cmd>FZFBuffers<CR>
+elseif s:use_telescope
+    nnoremap <leader>faf <cmd>Telescope find_files<cr>
+    nnoremap <leader>ff <cmd>Telescope git_files<cr>
+    nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+    nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+    nnoremap <leader>fb <cmd>Telescope buffers<cr>
+    nnoremap <leader>ts <cmd>Telescope treesitter<cr>
+    nnoremap <leader>ws <cmd>Telescope lsp_workspace_symbols<cr>
 endif
 
 
@@ -325,14 +410,19 @@ endif
 set foldenable
 set foldlevelstart=10
 set foldnestmax=10
-set foldmethod=syntax
+if s:use_tree_sitter
+    set foldmethod=expr
+    set foldexpr=nvim_treesitter#foldexpr()
+else
+    set foldmethod=syntax
+endif
 
 " -------------------------------- SPELL CHECK --------------------------------
 
 " highlight clear SpellBad
 " highlight SpellBad cterm=underline
-command! SpellCheckEng :setlocal spell spelllang=en
-command! SpellCheckFra :setlocal spell spelllang=fr
+command! SpellCheckEng <cmd>setlocal spell spelllang=en
+command! SpellCheckFra <cmd>setlocal spell spelllang=fr
 
 " -------------------------------- FILE SEARCH --------------------------------
 
@@ -361,10 +451,10 @@ noremap j gj
 noremap k gk
 
 " Clear search && close preview window
-nnoremap <silent> <leader><leader> :pclose<CR>:cclose<CR>:let @/ = ""<CR>
+nnoremap <silent> <leader><leader> <cmd>call Cleanup()<cr>
 
 " List buffers and prompt
-nnoremap <leader>b :ls<CR>:b 
+nnoremap <leader>b :ls<cr>:b 
 
 " Normal mode from terminal mode
 tnoremap <Esc> <C-\><C-n>
@@ -378,7 +468,7 @@ inoremap <A-k> <C-\><C-N><C-w>k
 inoremap <A-l> <C-\><C-N><C-w>l
 
 " Replace all occurences of word under cursor
-nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+nnoremap <leader>s <cmd>%s/\<<C-r><C-w>\>//g<Left><Left>
 
 " ------------------------------ CUSTOM FUNCTIONS -----------------------------
 
@@ -402,3 +492,8 @@ function! LightlineSpell()
     endif
 endfunction
 
+function! Cleanup()
+    pclose " Close preview window (lsp documentation etc)
+    cclose " Close quickfix list (grep, lsp diagnostics)
+    let @/ = "" " Erase current search
+endfunction
